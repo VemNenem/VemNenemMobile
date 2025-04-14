@@ -144,22 +144,25 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: "center",
     elevation: 4,
+    paddingTop: 30,
+    paddingBottom: 30,
   },
   forgotPasswordButton: {
     alignSelf: "flex-start",
     marginTop: 10,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "600",
+    fontSize: 16,
+    fontWeight: "400",
     marginBottom: 20,
     textAlign: "center",
+    color: "#707070"
   },
   inputLabel: {
     fontSize: 14,
     fontWeight: "600",
     marginBottom: 4,
-    color: "#333",
+    color: "#707070",
     alignSelf: "flex-start",
   },
   input: {
@@ -193,7 +196,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     marginBottom: 20,
     textDecorationLine: "underline",
-    fontWeight: "bold",
+    fontWeight: "600",
   },
   loginButton: {
     backgroundColor: "#42CFE0",

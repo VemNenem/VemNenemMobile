@@ -1,4 +1,5 @@
 import React from 'react';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity, SafeAreaView, ProgressBarAndroidBase, ProgressBarAndroidComponent } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -6,14 +7,19 @@ export default function Inicio() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
-        {/* Header */}
         <View style={styles.header}>
-          <View style={styles.iconCircle} />
-          <Text style={styles.title}>Início</Text>
-          <View style={styles.profileIcon} />
+          <View style={styles.iconContainer}>
+            <View style={styles.iconCircle}>
+              <Ionicons name="person-circle-outline" size={37} color="#ffffff" />
+            </View>
+          </View>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>Início</Text>
+          </View>
+          <View style={styles.iconContainer}>
+            <Ionicons name="people-outline" size={24} color="#707070" />
+          </View>
         </View>
-
-        {/* Semana atual */}
         <View style={[styles.cardContainer, styles.cardWithBorder]}>
           <ImageBackground
             source={require('../../../../assets/images/balao.png')}
@@ -23,27 +29,22 @@ export default function Inicio() {
             <Text style={styles.congratsTitle}>Parabéns!</Text>
             <Text style={styles.weekText}>Você está de 26 semanas!</Text>
           </ImageBackground>
-        </View>
-
-        {/* Faltam semanas */}
+        </View>        
         <View style={[styles.remainingCard, styles.cardWithBorder]}>
           <Text style={styles.remainingText}>Faltam apenas</Text>
           <Text style={styles.remainingTextBold}>13 semanas e 5 dias!</Text>
           <TouchableOpacity>
             <Text style={styles.editText}>Editar</Text>
           </TouchableOpacity>
-          {/* Barra de progresso */}
           <View style={{ height: 10, backgroundColor: '#e0e0e0', borderRadius: 5, overflow: 'hidden', marginVertical: 10 }}>
             <View style={{ width: '50%', height: '100%', backgroundColor: '#21FFB5' }} />
           </View>
           <View style={styles.divider} />
         </View>
-
-        {/* Lembretes */}
         <LinearGradient
-          colors={['#E0F7F4', '#FFFFFF']}
+          colors={['#42CFE0', '#FFFFFF']}
           start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+          end={{ x: 0, y: 1 }}
           style={[styles.remindersContainer, styles.cardWithBorder]}
         >
           <Text style={styles.sectionTitle}>Lembretes</Text>
@@ -63,6 +64,46 @@ export default function Inicio() {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    height: 60,
+    backgroundColor: '#fff',
+    marginBottom: 20,
+  },
+  iconContainer: {
+    width: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#42CFE0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  titleContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#707070',
+  },
+  profileIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
@@ -70,29 +111,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 16,
-    paddingTop: 10, // Espaço adicional se necessário
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  iconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#00D4A5',
-  },
-  profileIcon: {
-    width: 24,
-    height: 24,
-    backgroundColor: '#ccc',
-    borderRadius: 12,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    paddingTop: 10,
   },
   cardContainer: {
     marginBottom: 16,
@@ -116,12 +135,13 @@ const styles = StyleSheet.create({
   congratsTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#F67173',
     marginBottom: 8,
   },
   weekText: {
     fontSize: 18,
-    color: '#fff',
+    color: '#F67173',
+    fontWeight: "500",
   },
   remainingCard: {
     backgroundColor: '#fff',
@@ -131,13 +151,13 @@ const styles = StyleSheet.create({
   },
   remainingText: {
     fontSize: 16,
-    color: '#666',
+    color: '#707070',
     marginBottom: 4,
   },
   remainingTextBold: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#707070',
     marginBottom: 8,
   },
   editText: {
@@ -157,7 +177,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 12,
-    color: '#333',
+    color: '#ffffff',
+    alignSelf: "center"
   },
   reminderItem: {
     backgroundColor: '#fff',
