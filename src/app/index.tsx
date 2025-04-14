@@ -20,12 +20,12 @@ export default function Login() {
 
   return (
     <ImageBackground
-      source={require("../../assets/images/background.png")} 
+      source={require("../../assets/images/background.png")}
       style={styles.background}
       resizeMode="cover"
     >
       <View style={styles.container}>
-        <Image source={require("../../assets/images/logo.png")} style={styles.logo} />  
+        <Image source={require("../../assets/images/logo.png")} style={styles.logo} />
 
         <View style={styles.switchContainer}>
           <TouchableOpacity
@@ -86,7 +86,12 @@ export default function Login() {
             <Text style={styles.registerButtonText}>CADASTRAR</Text>
           </TouchableOpacity>
 
-          <Text style={styles.termsText}>Termos de Uso e Política de Privacidade</Text>
+          <TouchableOpacity onPress={() => router.push('/(main)/inicio')}>
+            <Text style={styles.termsText}>
+              Termos de Uso e Política de Privacidade
+            </Text>
+          </TouchableOpacity>
+
         </View>
       </View>
     </ImageBackground>
