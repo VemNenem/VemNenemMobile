@@ -14,13 +14,13 @@ interface Post {
 const posts: Post[] = [
   {
     id: '1',
-    title: 'Práticas básicas de primeiros socorros',
+    title: 'cccccc',
     author: 'Bryan Henrique',
     image: require('../../../../assets/images/logo.png'),
   },
   {
     id: '2',
-    title: 'Paternidade',
+    title: 'bbbbbbbbbbbbbbbbb',
     author: 'Bryan Henrique',
     image: require('../../../../assets/images/logo.png'),
   },
@@ -51,22 +51,20 @@ const Blog = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        {/* Header */}
-        <Cabecalho
-          title="Blog"
-          route="../(main)/perfil"
-          route2="../(social)/compartilhar"
-        />
-
-        {/* Lista de posts */}
-        <FlatList
-          data={posts}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        />
-      </View>
+    <View style={styles.container}>
+      <Cabecalho
+              title="Compartilhar"
+              route='../(main)/perfil'
+              route2='../(social)/compartilhar'
+              ></Cabecalho>
+   
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      />
+    </View>
     </SafeAreaView>
   );
 };
@@ -74,55 +72,55 @@ const Blog = () => {
 export default Blog;
 
 const styles = StyleSheet.create({
-
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    height: 60,
-    marginBottom: 20,
-  },
-  iconContainer: {
-    width: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#42CFE0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  titleContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#707070',
-  },
-  profileIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#ffffff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  container: {
-    flexGrow: 1,
-    padding: 16,
-    paddingTop: 10,
-  },
+    
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        height: 60,
+        marginBottom: 20,
+      },
+      iconContainer: {
+        width: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      iconCircle: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#42CFE0',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      titleContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      title: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#707070',
+      },
+      profileIcon: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#ffffff',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      safeArea: {
+        flex: 1,
+        backgroundColor: '#fff',
+      },
+      container: {
+        flexGrow: 1,
+        padding: 16,
+        paddingTop: 10,
+      },
   card: {
     flexDirection: 'row',
     backgroundColor: '#fff',

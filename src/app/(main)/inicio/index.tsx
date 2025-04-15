@@ -1,25 +1,20 @@
 import React from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity, SafeAreaView, ProgressBarAndroidBase, ProgressBarAndroidComponent } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { shadow } from '@/global/shadow';
+import Cabecalho from '@/src/components/cabecalho';
 
 export default function Inicio() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.iconContainer}>
-            <View style={styles.iconCircle}>
-              <Ionicons name="person-circle-outline" size={37} color="#ffffff" />
-            </View>
-          </View>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>Início</Text>
-          </View>
-          <View style={styles.iconContainer}>
-            <Ionicons name="people-outline" size={24} color="#707070" />
-          </View>
-        </View>
+        <Cabecalho
+        title="Inicio"
+        route='../(social)/perfil'
+        route2='../(social)/compartilhar'
+        ></Cabecalho>
+
         <View style={[styles.cardContainer, styles.cardWithBorder]}>
           <ImageBackground
             source={require('../../../../assets/images/balao.png')}
@@ -30,7 +25,8 @@ export default function Inicio() {
             <Text style={styles.weekText}>Você está de 26 semanas!</Text>
           </ImageBackground>
         </View>        
-        <View style={[styles.remainingCard, styles.cardWithBorder]}>
+
+        <View style={[shadow.default, styles.remainingCard, styles.cardWithBorder]}>
           <Text style={styles.remainingText}>Faltam apenas</Text>
           <Text style={styles.remainingTextBold}>13 semanas e 5 dias!</Text>
           <TouchableOpacity>
@@ -41,6 +37,7 @@ export default function Inicio() {
           </View>
           <View style={styles.divider} />
         </View>
+        
         <LinearGradient
           colors={['#42CFE0', '#FFFFFF']}
           start={{ x: 0, y: 0 }}
