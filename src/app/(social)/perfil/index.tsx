@@ -13,6 +13,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import CabecalhoComLogout from '@/src/components/headerlogout';
+import { RelativePathString, router } from 'expo-router';
 
 const Perfil = () => {
   const [nome, setNome] = useState('');
@@ -44,7 +45,7 @@ const Perfil = () => {
         <View style={styles.headerWrapper}>
           <CabecalhoComLogout
             title="Perfil"
-            route="../(main)/inicio"
+            route={"inicio" as RelativePathString}
             rightIcon="log-out-outline"
             backgroundColor="#42CFE0"
             textColor="#fff"
@@ -133,7 +134,7 @@ const Perfil = () => {
               />
             </View>
 
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={() => router.push('/senha')}>
               <Text style={styles.buttonText}>Alterar senha</Text>
             </TouchableOpacity>
 
@@ -238,3 +239,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
