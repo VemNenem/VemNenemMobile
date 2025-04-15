@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, SafeAreaView } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import Cabecalho from '@/src/components/cabecalho';
+import Cabecalho from '@/src/components/header';
+
 
 interface Tool {
   id: string;

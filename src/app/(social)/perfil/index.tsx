@@ -1,147 +1,171 @@
-import React from 'react';
-import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ListRenderItem, SafeAreaView } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import Cabecalho from '@/src/components/cabecalho';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import Cabecalho from '@/src/components/header';
 
-
-interface Post {
-  id: string;
-  title: string;
-  author: string;
-  image: any; // Pode trocar por ImageSourcePropType se quiser mais específico
-}
-
-const posts: Post[] = [
-  {
-    id: '1',
-    title: 'aaaaaaaaaaaaaaaaaa',
-    author: 'Bryan Henrique',
-    image: require('../../../../assets/images/logo.png'),
-  },
-  {
-    id: '2',
-    title: 'bbbbbbbbbbbbbbbbb',
-    author: 'Bryan Henrique',
-    image: require('../../../../assets/images/logo.png'),
-  },
-  {
-    id: '3',
-    title: 'Como fazer sua lista de enxoval',
-    author: 'Bryan Henrique',
-    image: require('../../../../assets/images/logo.png'),
-  },
-  {
-    id: '4',
-    title: 'Muita cólica?',
-    author: 'Bryan Henrique',
-    image: require('../../../../assets/images/logo.png'),
-  },
-];
-
-const Blog = () => {
-  const renderItem: ListRenderItem<Post> = ({ item }) => (
-    <TouchableOpacity style={styles.card}>
-      <Image source={item.image} style={styles.image} />
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.author}>Por: {item.author}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+const Perfil = () => {
+  const [nome, setNome] = useState('Julia Oliveira');
+  const [dpp, setDpp] = useState('30/06/2025');
+  const [sexoBebe, setSexoBebe] = useState('Masculino');
+  const [nomeBebe, setNomeBebe] = useState('Lucas');
+  const [nomePai, setNomePai] = useState('Bryan Henrique');
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-    <View style={styles.container}>
+    <View style={styles.wrapper}>
+      <View style={{ backgroundColor: '#42CFE0' }}>
       <Cabecalho
-              title="Perfil"
-              route='../(main)/inicio'
-              route2='../(social)/compartilhar'
-              ></Cabecalho>
-   
-      <FlatList
-        data={posts}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      />
+  title="Perfil"
+  route="../(main)/inicio"
+  route2="../(social)/compartilhar"
+  backgroundColor="#42CFE0"
+  textColor="#fff"
+/>
+
+</View>
+
+      <ScrollView contentContainerStyle={styles.profileContainer}>
+        <View style={styles.formBox}>
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>Nome</Text>
+            <TextInput
+              style={styles.input}
+              value={nome}
+              onChangeText={setNome}
+              placeholder="Digite seu nome"
+              placeholderTextColor="#aaa"
+            />
+          </View>
+
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>DPP (Data Provável do Parto)</Text>
+            <TextInput
+              style={styles.input}
+              value={dpp}
+              onChangeText={setDpp}
+              placeholder="DD/MM/AAAA"
+              placeholderTextColor="#aaa"
+            />
+          </View>
+
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>Sexo do bebê</Text>
+            <TextInput
+              style={styles.input}
+              value={sexoBebe}
+              onChangeText={setSexoBebe}
+              placeholder="Masculino ou Feminino"
+              placeholderTextColor="#aaa"
+            />
+          </View>
+
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>Nome do bebê</Text>
+            <TextInput
+              style={styles.input}
+              value={nomeBebe}
+              onChangeText={setNomeBebe}
+              placeholder="Digite o nome do bebê"
+              placeholderTextColor="#aaa"
+            />
+          </View>
+
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>Nome do pai</Text>
+            <TextInput
+              style={styles.input}
+              value={nomePai}
+              onChangeText={setNomePai}
+              placeholder="Digite o nome do pai"
+              placeholderTextColor="#aaa"
+            />
+          </View>
+
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Alterar senha</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.saveButton}>
+            <Text style={styles.saveButtonText}>SALVAR</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.deleteButton}>
+            <Text style={styles.deleteButtonText}>DELETAR CONTA</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
-    </SafeAreaView>
   );
 };
 
-export default Blog;
+export default Perfil;
 
 const styles = StyleSheet.create({
-    
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        height: 60,
-        marginBottom: 20,
-      },
-      iconContainer: {
-        width: 40,
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-      iconCircle: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: '#42CFE0',
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-      titleContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-      title: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: '#707070',
-      },
-      profileIcon: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: '#ffffff',
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-      safeArea: {
-        flex: 1,
-        backgroundColor: '#fff',
-      },
-      container: {
-        flexGrow: 1,
-        padding: 16,
-        paddingTop: 10,
-      },
-  card: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 10,
-    marginBottom: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e6d9f9',
-  },
-  image: {
-    width: 70,
-    height: 70,
-    borderRadius: 10,
-    marginRight: 12,
-  },
-  textContainer: {
+  wrapper: {
     flex: 1,
+    backgroundColor: '#42CFE0',
   },
-  author: {
-    fontSize: 12,
-    color: '#666',
+  profileContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    alignItems: 'center',
+  },
+  formBox: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    width: '100%',
+    marginTop: 10,
+  },
+  fieldContainer: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 14,
+    color: '#707070',
+    marginBottom: 5,
+  },
+  input: {
+    fontSize: 16,
+    color: '#000',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    backgroundColor: '#fff',
+  },
+  button: {
+    marginTop: 10,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontWeight: "500",
+    fontSize: 14,
+    color: '#707070',
+    textDecorationLine: 'underline',
+  },
+  saveButton: {
+    marginTop: 20,
+    backgroundColor: '#42CFE0',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  saveButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  deleteButton: {
+    marginTop: 15,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    backgroundColor: '#F67173',
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });

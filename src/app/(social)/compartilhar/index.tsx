@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ListRenderItem, SafeAreaView } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import Cabecalho from '@/src/components/cabecalho';
+import Cabecalho from '@/src/components/header';
+
 
 
 interface Post {
@@ -54,8 +55,8 @@ const Blog = () => {
     <View style={styles.container}>
       <Cabecalho
               title="Compartilhar"
-              route='../(main)/perfil'
-              route2='../(social)/compartilhar'
+              route='../(social)/perfil'
+              route2='../(main)/inicio'
               ></Cabecalho>
    
       <FlatList

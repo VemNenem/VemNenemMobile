@@ -1,14 +1,15 @@
 import React from 'react';
 import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ListRenderItem, SafeAreaView } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import Cabecalho from '@/src/components/cabecalho';
+import Cabecalho from '@/src/components/header';
+
 
 
 interface Post {
   id: string;
   title: string;
   author: string;
-  image: any; // Pode trocar por ImageSourcePropType se quiser mais específico
+  image: any;
 }
 
 const posts: Post[] = [

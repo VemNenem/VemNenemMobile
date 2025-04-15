@@ -7,38 +7,38 @@ interface CabecalhoProps {
   title: string;
   route: RelativePathString;
   route2: RelativePathString;
+  backgroundColor?: string;
+  textColor?: string;
 }
 
-export default function Cabecalho({ title, route, route2 }: CabecalhoProps) {
+export default function Cabecalho({
+  title,
+  route,
+  route2,
+  backgroundColor = '#fff',
+  textColor = '#707070',
+}: CabecalhoProps) {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.iconContainer}>
-            <TouchableOpacity
-              onPress={() => router.push(route)}
-              accessibilityLabel="Perfil do usuário"
-            >
-              <View style={styles.iconCircle}>
-                <Ionicons name="person-circle-outline" size={37} color="#ffffff" />
-              </View>
-            </TouchableOpacity>
-          </View>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
+      <View style={[styles.header, { backgroundColor }]}>
+        <View style={styles.iconContainer}>
+          <TouchableOpacity onPress={() => router.push(route)} accessibilityLabel="Perfil do usuário">
+            <View style={styles.iconCircle}>
+              <Ionicons name="person-circle-outline" size={37} color="#ffffff" />
+            </View>
+          </TouchableOpacity>
+        </View>
 
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>{title}</Text>
-          </View>
+        <View style={styles.titleContainer}>
+          <Text style={[styles.title, { color: textColor }]}>{title}</Text>
+        </View>
 
-          <View style={styles.iconContainer}>
-            <TouchableOpacity
-              onPress={() => router.push(route2)}
-              accessibilityLabel="Lista de usuários"
-            >
-              <Ionicons name="people-outline" size={24} color="#707070" />
-            </TouchableOpacity>
-          </View>
+        <View style={styles.iconContainer}>
+          <TouchableOpacity onPress={() => router.push(route2)} accessibilityLabel="Lista de usuários">
+            <Ionicons name="people-outline" size={24} color={textColor} />
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
@@ -52,7 +52,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     height: 60,
-    backgroundColor: '#fff',
     marginBottom: 20,
   },
   iconContainer: {
@@ -76,12 +75,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#707070',
   },
-  safeArea: {
-    backgroundColor: '#fff',
-  },
-  container: {
-    paddingTop: 10,
-  },
+  safeArea: {},
 });

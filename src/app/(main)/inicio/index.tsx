@@ -3,7 +3,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { shadow } from '@/global/shadow';
-import Cabecalho from '@/src/components/cabecalho';
+import Cabecalho from '@/src/components/header';
+
 
 export default function Inicio() {
   return (
