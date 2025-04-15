@@ -1,26 +1,44 @@
 import React from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import { useRouter, type RelativePathString } from 'expo-router';
 
 interface CabecalhoProps {
   title: string;
   route: RelativePathString;
-  route2: RelativePathString;
   backgroundColor?: string;
   textColor?: string;
-  rightIcon?: keyof typeof Ionicons.glyphMap; // <- NOVO
+  rightIcon?: keyof typeof Ionicons.glyphMap;
 }
 
-export default function Cabecalho({
+export default function CabecalhoComLogout({
   title,
   route,
-  route2,
   backgroundColor = '#fff',
   textColor = '#707070',
-  rightIcon = 'people-outline', // <- padrão
+  rightIcon = 'people-outline',
 }: CabecalhoProps) {
   const router = useRouter();
+
+  const handleRightIconPress = () => {
+    if (rightIcon === 'log-out-outline') {
+      Alert.alert(
+        'Logout',
+        'Tem certeza que deseja sair?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Sair',
+            style: 'destructive',
+            onPress: () => router.replace('/'),
+          },
+        ],
+        { cancelable: true }
+      );
+    } else {
+      router.push('/(social)/compartilhar'); // Ou outra rota padrão
+    }
+  };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
@@ -38,7 +56,7 @@ export default function Cabecalho({
         </View>
 
         <View style={styles.iconContainer}>
-          <TouchableOpacity onPress={() => router.push(route2)} accessibilityLabel="Ação da direita">
+          <TouchableOpacity onPress={handleRightIconPress} accessibilityLabel="Ação da direita">
             <Ionicons name={rightIcon} size={24} color={textColor} />
           </TouchableOpacity>
         </View>
