@@ -56,7 +56,7 @@ const Blog = () => {
         {/* Header */}
         <Cabecalho
           title="Blog"
-          route="../(main)/perfil"
+          route="../(social)/perfil"
           route2="../(social)/compartilhar"
         />
 

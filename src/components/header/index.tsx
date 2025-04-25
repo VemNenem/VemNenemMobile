@@ -6,7 +6,7 @@ import { useRouter, type RelativePathString } from 'expo-router';
 interface CabecalhoProps {
   title: string;
   route: RelativePathString;
-  route2: RelativePathString;
+  route2: RelativePathString | (() => void);
   backgroundColor?: string;
   textColor?: string;
   rightIcon?: keyof typeof Ionicons.glyphMap; // <- NOVO
@@ -38,7 +38,13 @@ export default function Cabecalho({
         </View>
 
         <View style={styles.iconContainer}>
-          <TouchableOpacity onPress={() => router.push(route2)} accessibilityLabel="Ação da direita">
+          <TouchableOpacity onPress={() => {
+  if (typeof route2 === 'function') {
+    route2(); // chama a função
+  } else if (typeof route2 === 'string') {
+    router.push(route2); // ou use Link
+  }
+}}>
             <Ionicons name={rightIcon} size={24} color={textColor} />
           </TouchableOpacity>
         </View>

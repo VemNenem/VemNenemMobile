@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ListRenderItem, SafeAreaView } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Cabecalho from '@/src/components/header';
-
+import { useRouter } from 'expo-router';
 
 
 interface Post {
@@ -40,6 +40,8 @@ const posts: Post[] = [
 ];
 
 const Blog = () => {
+  const router = useRouter();
+
   const renderItem: ListRenderItem<Post> = ({ item }) => (
     <TouchableOpacity style={styles.card}>
       <Image source={item.image} style={styles.image} />
@@ -56,7 +58,7 @@ const Blog = () => {
       <Cabecalho
               title="Compartilhar"
               route='../(social)/perfil'
-              route2='../(main)/inicio'
+              route2={() => router.back()} 
               ></Cabecalho>
    
       <FlatList

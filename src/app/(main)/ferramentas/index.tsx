@@ -32,7 +32,7 @@ const Ferramentas = () => {
         {/* Header */}
         <Cabecalho
           title="Ferramentas"
-          route="../(main)/perfil"
+          route="../(social)/perfil"
           route2="../(social)/compartilhar"
         />
 
