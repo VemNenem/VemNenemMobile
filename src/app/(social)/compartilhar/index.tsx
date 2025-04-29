@@ -58,7 +58,7 @@ const Blog = () => {
       <Cabecalho
               title="Compartilhar"
               route='../(social)/perfil'
-              route2={() => router.back()} 
+              route2='../(main)/inicio'
               ></Cabecalho>
    
       <FlatList

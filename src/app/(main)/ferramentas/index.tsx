@@ -1,24 +1,30 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, SafeAreaView } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useRouter } from 'expo-router';
 import Cabecalho from '@/src/components/header';
-
 
 interface Tool {
   id: string;
   name: string;
   icon: keyof typeof Ionicons.glyphMap;
+  route: any; // Usamos 'any' como solução prática para o Expo Router
 }
 
 const tools: Tool[] = [
-  { id: '1', name: 'Listas', icon: 'list-outline' },
-  { id: '2', name: 'Plano de Parto', icon: 'clipboard-outline' },
-  { id: '3', name: 'Agenda', icon: 'calendar-outline' },
+  { id: '1', name: 'Listas', icon: 'list-outline', route: 'lista' },
+  { id: '2', name: 'Plano de Parto', icon: 'clipboard-outline', route: 'plano' },
+  { id: '3', name: 'Agenda', icon: 'calendar-outline', route: 'agenda' },
 ];
 
 const Ferramentas = () => {
+  const router = useRouter();
+
   const renderItem = ({ item }: { item: Tool }) => (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity 
+      style={styles.card}
+      onPress={() => router.push(item.route)}
+    >
       <View style={styles.iconBox}>
         <Ionicons name={item.icon} size={22} color="#fff" />
       </View>
@@ -29,14 +35,12 @@ const Ferramentas = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Header */}
         <Cabecalho
           title="Ferramentas"
           route="../(social)/perfil"
           route2="../(social)/compartilhar"
         />
 
-        {/* Lista */}
         <FlatList
           data={tools}
           keyExtractor={(item) => item.id}
