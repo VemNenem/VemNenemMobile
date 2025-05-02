@@ -12,9 +12,9 @@ interface Tool {
 }
 
 const tools: Tool[] = [
-  { id: '1', name: 'Listas', icon: 'list-outline', route: 'lista' },
-  { id: '2', name: 'Plano de Parto', icon: 'clipboard-outline', route: 'plano' },
-  { id: '3', name: 'Agenda', icon: 'calendar-outline', route: 'agenda' },
+  { id: '1', name: 'Listas', icon: 'list-outline', route: '(tools)/listas' },
+  { id: '2', name: 'Plano de Parto', icon: 'clipboard-outline', route: '(tools)/plano' },
+  { id: '3', name: 'Agenda', icon: 'calendar-outline', route: '(tools)/agenda' },
 ];
 
 const Ferramentas = () => {
