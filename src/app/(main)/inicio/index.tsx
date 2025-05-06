@@ -10,10 +10,14 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 import { shadow } from '@/global/shadow';
 import Cabecalho from '@/src/components/header';
+import { router } from 'expo-router';
 
 export default function Inicio() {
+  const navigation = useNavigation();
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -44,13 +48,13 @@ export default function Inicio() {
         >
           <Text style={styles.remainingText}>Faltam apenas</Text>
           <Text style={styles.remainingTextBold}>13 semanas e 5 dias!</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/(social)/perfil')}>
             <Text style={styles.editText}>Editar</Text>
           </TouchableOpacity>
           <View
             style={{
               height: 15,
-              backgroundColor:  'rgba(66, 207, 224, 0.3)',
+              backgroundColor: 'rgba(66, 207, 224, 0.3)',
               borderRadius: 15,
               overflow: 'hidden',
               marginVertical: 10,

@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#e6d9f9',
+    borderColor: '#EFEFEF',
   },
   image: {
     width: 70,
