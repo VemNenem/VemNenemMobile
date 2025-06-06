@@ -1,12 +1,5 @@
-import {
-    ImageBackground,
-  } from "react-native";
+import { Slot } from 'expo-router';
 
 export default function RootLayout() {
-  return (
-    <ImageBackground
-    source={require("../../../assets/images/background.png")} 
-    resizeMode="cover"
-  ></ImageBackground>
-  )
+  return <Slot />;
 }

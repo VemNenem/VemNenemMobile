@@ -39,12 +39,16 @@ export default function Login() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.switchButton, tipo === "papai" && styles.activeSwitch]}
-            onPress={() => setTipo("papai")}
+            onPress={() => {
+              setTipo("papai");
+              router.push("/(Auth)/loginpai"); // navega para login pai
+            }}
           >
             <Text style={[styles.switchText, tipo === "papai" && styles.activeSwitchText]}>
               Sou papai
             </Text>
           </TouchableOpacity>
+
         </View>
 
         <View style={styles.card}>
@@ -87,7 +91,7 @@ export default function Login() {
             <Text style={styles.registerButtonText}>CADASTRAR</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => router.push('/(main)/inicio')}>
+          <TouchableOpacity onPress={() => router.push('/(Auth)/termos')}>
             <Text style={styles.termsText}>
               Termos de Uso e Política de Privacidade
             </Text>
@@ -102,6 +106,8 @@ export default function Login() {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
+    width: "100%",
+    height: "100%",
     justifyContent: "center",
     alignItems: "center",
   },
