@@ -9,6 +9,7 @@ import {
   ImageBackground,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
 
@@ -87,7 +88,7 @@ export default function Login() {
             <Text style={styles.loginButtonText}>ENTRAR</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.registerButton}>
+          <TouchableOpacity style={styles.registerButton} onPress={() => router.push("/(Auth)/cadastro")}>
             <Text style={styles.registerButtonText}>CADASTRAR</Text>
           </TouchableOpacity>
 
