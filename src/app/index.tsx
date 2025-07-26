@@ -29,29 +29,6 @@ export default function Login() {
       <View style={styles.container}>
         <Image source={require("../../assets/images/logo.png")} style={styles.logo} />
 
-        <View style={styles.switchContainer}>
-          <TouchableOpacity
-            style={[styles.switchButton, tipo === "mamãe" && styles.activeSwitch]}
-            onPress={() => setTipo("mamãe")}
-          >
-            <Text style={[styles.switchText, tipo === "mamãe" && styles.activeSwitchText]}>
-              Sou mamãe
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.switchButton, tipo === "papai" && styles.activeSwitch]}
-            onPress={() => {
-              setTipo("papai");
-              router.push("/(Auth)/loginpai"); // navega para login pai
-            }}
-          >
-            <Text style={[styles.switchText, tipo === "papai" && styles.activeSwitchText]}>
-              Sou papai
-            </Text>
-          </TouchableOpacity>
-
-        </View>
-
         <View style={styles.card}>
           <Text style={styles.title}>Bem vindo(a)!</Text>
 
@@ -64,7 +41,7 @@ export default function Login() {
             style={styles.input}
             placeholderTextColor="#707070"
           />
-
+          
           <Text style={styles.inputLabel}>Senha</Text>
           <View style={styles.passwordContainer}>
             <TextInput
