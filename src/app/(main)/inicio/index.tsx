@@ -1,5 +1,4 @@
 import React from 'react';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import {
   View,
   Text,
@@ -15,6 +14,7 @@ import { shadow } from '@/global/shadow';
 import Cabecalho from '@/src/components/header';
 import { router } from 'expo-router';
 
+
 export default function Inicio() {
   const navigation = useNavigation();
 
@@ -24,7 +24,6 @@ export default function Inicio() {
         <Cabecalho
           title="Inicio"
           route="../(social)/perfil"
-          route2="../(social)/compartilhar"
         />
 
         {/* Cartão Parabéns */}

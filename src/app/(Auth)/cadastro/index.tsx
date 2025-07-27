@@ -133,14 +133,6 @@ export default function Cadastro() {
                                 placeholderTextColor="#707070"
                             />
 
-                            <Text style={styles.inputLabel}>Nome do pai</Text>
-                            <TextInput
-                                value={formData.nomePai}
-                                onChangeText={(text) => handleChange("nomePai", text)}
-                                style={styles.input}
-                                placeholder="Digite seu nome"
-                                placeholderTextColor="#707070"
-                            />
                         </ScrollView>
                     )}
 

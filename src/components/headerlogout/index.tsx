@@ -8,41 +8,36 @@ interface CabecalhoProps {
   route: RelativePathString;
   backgroundColor?: string;
   textColor?: string;
-  rightIcon?: keyof typeof Ionicons.glyphMap;
 }
 
-export default function CabecalhoComLogout({
+export default function CabecalhoLogout({
   title,
   route,
   backgroundColor = '#fff',
   textColor = '#707070',
-  rightIcon = 'people-outline',
 }: CabecalhoProps) {
   const router = useRouter();
 
-  const handleRightIconPress = () => {
-    if (rightIcon === 'log-out-outline') {
-      Alert.alert(
-        'Logout',
-        'Tem certeza que deseja sair?',
-        [
-          { text: 'Cancelar', style: 'cancel' },
-          {
-            text: 'Sair',
-            style: 'destructive',
-            onPress: () => router.replace('/'),
-          },
-        ],
-        { cancelable: true }
-      );
-    } else {
-      router.push('/(social)/compartilhar'); // Ou outra rota padrão
-    }
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Tem certeza que deseja sair?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: () => router.replace('/'), // sua tela inicial ou login
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
       <View style={[styles.header, { backgroundColor }]}>
+        {/* Ícone perfil esquerda */}
         <View style={styles.iconContainer}>
           <TouchableOpacity onPress={() => router.push(route)} accessibilityLabel="Perfil do usuário">
             <View style={styles.iconCircle}>
@@ -51,13 +46,15 @@ export default function CabecalhoComLogout({
           </TouchableOpacity>
         </View>
 
+        {/* Título */}
         <View style={styles.titleContainer}>
           <Text style={[styles.title, { color: textColor }]}>{title}</Text>
         </View>
 
+        {/* Ícone logout direita */}
         <View style={styles.iconContainer}>
-          <TouchableOpacity onPress={handleRightIconPress} accessibilityLabel="Ação da direita">
-            <Ionicons name={rightIcon} size={24} color={textColor} />
+          <TouchableOpacity onPress={handleLogout} accessibilityLabel="Logout">
+            <Ionicons name="log-out-outline" size={24} color={textColor} />
           </TouchableOpacity>
         </View>
       </View>

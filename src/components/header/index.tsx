@@ -1,30 +1,43 @@
 import React from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import { useRouter, type RelativePathString } from 'expo-router';
 
 interface CabecalhoProps {
   title: string;
   route: RelativePathString;
-  route2: RelativePathString | (() => void);
   backgroundColor?: string;
   textColor?: string;
-  rightIcon?: keyof typeof Ionicons.glyphMap; // <- NOVO
 }
 
-export default function Cabecalho({
+export default function CabecalhoLogout({
   title,
   route,
-  route2,
   backgroundColor = '#fff',
   textColor = '#707070',
-  rightIcon = 'people-outline', // <- padrão
 }: CabecalhoProps) {
   const router = useRouter();
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Tem certeza que deseja sair?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: () => router.replace('/'), // sua tela inicial ou login
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
       <View style={[styles.header, { backgroundColor }]}>
+        {/* Ícone perfil esquerda */}
         <View style={styles.iconContainer}>
           <TouchableOpacity onPress={() => router.push(route)} accessibilityLabel="Perfil do usuário">
             <View style={styles.iconCircle}>
@@ -33,19 +46,15 @@ export default function Cabecalho({
           </TouchableOpacity>
         </View>
 
+        {/* Título */}
         <View style={styles.titleContainer}>
           <Text style={[styles.title, { color: textColor }]}>{title}</Text>
         </View>
 
+        {/* Ícone logout direita */}
         <View style={styles.iconContainer}>
-          <TouchableOpacity onPress={() => {
-  if (typeof route2 === 'function') {
-    route2(); // chama a função
-  } else if (typeof route2 === 'string') {
-    router.push(route2); // ou use Link
-  }
-}}>
-            <Ionicons name={rightIcon} size={24} color={textColor} />
+          <TouchableOpacity onPress={handleLogout} accessibilityLabel="Logout">
+            <Ionicons name="log-out-outline" size={24} color={textColor} />
           </TouchableOpacity>
         </View>
       </View>

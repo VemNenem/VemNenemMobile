@@ -46,7 +46,6 @@ const Perfil = () => {
           <CabecalhoComLogout
             title="Perfil"
             route={"inicio" as RelativePathString}
-            rightIcon="log-out-outline"
             backgroundColor="#42CFE0"
             textColor="#fff"
           />

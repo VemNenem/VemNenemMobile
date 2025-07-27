@@ -38,7 +38,6 @@ const Ferramentas = () => {
         <Cabecalho
           title="Ferramentas"
           route="../(social)/perfil"
-          route2="../(social)/compartilhar"
         />
 
         <FlatList

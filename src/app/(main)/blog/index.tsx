@@ -57,7 +57,6 @@ const Blog = () => {
         <Cabecalho
           title="Blog"
           route="../(social)/perfil"
-          route2="../(social)/compartilhar"
         />
 
         {/* Lista de posts */}
