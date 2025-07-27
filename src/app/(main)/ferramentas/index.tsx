@@ -12,9 +12,9 @@ interface Tool {
 }
 
 const tools: Tool[] = [
-  { id: '1', name: 'Listas', icon: 'list-outline', route: '(tools)/listas' },
-  { id: '2', name: 'Plano de Parto', icon: 'clipboard-outline', route: '(tools)/plano' },
-  { id: '3', name: 'Agenda', icon: 'calendar-outline', route: '(tools)/agenda' },
+  { id: '1', name: 'Listas', icon: 'list-outline', route: '/Lista' },
+  { id: '2', name: 'Plano de Parto', icon: 'clipboard-outline', route: '/Plano' },
+  { id: '3', name: 'Agenda', icon: 'calendar-outline', route: '/Agenda' },
 ];
 
 const Ferramentas = () => {
@@ -78,6 +78,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#EFEFEF',
+     shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
   },
   cardText: {
     padding: 16,
