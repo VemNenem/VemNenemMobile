@@ -68,7 +68,18 @@ type EventosPorData = {
   [data: string]: Evento[];
 };
 
+// Obtém a data atual no formato YYYY-MM-DD
+const hoje = new Date().toISOString().split("T")[0];
+
 const eventosExemplo: EventosPorData = {
+  // Evento para a data atual (hoje)
+  [hoje]: [
+    {
+      titulo: "Consulta de Exemplo",
+      descricao: "Este é um card de evento de teste para visualização",
+      data: hoje.split("-").reverse().join("/").substring(0, 5), // Formata como DD/MM
+    },
+  ],
   "2024-02-12": [
     {
       titulo: "Consulta Médica",
@@ -93,7 +104,6 @@ const eventosExemplo: EventosPorData = {
 };
 
 export default function TelaAgenda() {
-  const hoje = new Date().toISOString().split("T")[0];
   const [dataSelecionada, setDataSelecionada] = useState(hoje);
 
   const marcarDatas = () => {
