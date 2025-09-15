@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DropDownPicker from 'react-native-dropdown-picker';
 import {
   View,
   Text,
@@ -18,27 +19,20 @@ const Perfil = () => {
   const [nome, setNome] = useState('');
   const [dpp, setDpp] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [sexoBebe, setSexoBebe] = useState('');
+  const [openDropdown, setOpenDropdown] = useState(false);
+  const [sexoOptions, setSexoOptions] = useState([
+    { label: 'Masculino', value: 'Masculino' },
+    { label: 'Feminino', value: 'Feminino' },
+  ]);
   const [nomeBebe, setNomeBebe] = useState('');
   const [nomePai, setNomePai] = useState('');
-  const [sexoBebe, setSexoBebe] = useState('');
 
   const handleDateChange = (_event: any, selectedDate?: Date) => {
     setShowDatePicker(false);
     if (selectedDate) {
       setDpp(selectedDate);
     }
-  };
-
-  const handleSalvar = () => {
-    const dados = {
-      nome,
-      dpp,
-      nomeBebe,
-      nomePai,
-      sexoBebe,
-    };
-    console.log("Dados do perfil:", dados);
-    // aqui você pode enviar para a API ou salvar no storage
   };
 
   return (
@@ -97,42 +91,24 @@ const Perfil = () => {
                 />
               )}
             </View>
-            
-            <Text style={styles.inputLabel}>Sexo do bebê</Text>
-            <View style={styles.radioContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.radioButton,
-                  sexoBebe === "Masculino" && styles.radioSelected,
-                ]}
-                onPress={() => setSexoBebe("Masculino")}
-              >
-                <Text
-                  style={[
-                    styles.radioText,
-                    sexoBebe === "Masculino" && { color: "#fff" },
-                  ]}
-                >
-                  Masculino
-                </Text>
-              </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[
-                  styles.radioButton,
-                  sexoBebe === "Feminino" && styles.radioSelected,
-                ]}
-                onPress={() => setSexoBebe("Feminino")}
-              >
-                <Text
-                  style={[
-                    styles.radioText,
-                    sexoBebe === "Feminino" && { color: "#fff" },
-                  ]}
-                >
-                  Feminino
-                </Text>
-              </TouchableOpacity>
+            {/* DropDown com zIndex maior para não causar erro */}
+            <View style={[styles.fieldContainer, { zIndex: 3000 }]}>
+              <Text style={styles.label}>Sexo do bebê</Text>
+              <DropDownPicker
+                open={openDropdown}
+                value={sexoBebe}
+                items={sexoOptions}
+                setOpen={setOpenDropdown}
+                setValue={setSexoBebe}
+                setItems={setSexoOptions}
+                placeholder="Selecione o sexo"
+                style={styles.dropdown}
+                dropDownContainerStyle={styles.dropdownContainer}
+                zIndex={3000}
+                zIndexInverse={1000}
+                listMode="SCROLLVIEW"
+              />
             </View>
 
             <View style={styles.fieldContainer}>
@@ -161,7 +137,7 @@ const Perfil = () => {
               <Text style={styles.buttonText}>Alterar senha</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.saveButton} onPress={handleSalvar}>
+            <TouchableOpacity style={styles.saveButton}>
               <Text style={styles.saveButtonText}>SALVAR</Text>
             </TouchableOpacity>
 
@@ -217,10 +193,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     backgroundColor: '#fff',
   },
-  inputLabel: {
-    fontSize: 14,
-    color: '#707070',
-    marginBottom: 8,
+  dropdown: {
+    borderColor: '#ccc',
+    borderRadius: 10,
+    backgroundColor: '#fff',
+  },
+  dropdownContainer: {
+    borderColor: '#ccc',
+    backgroundColor: '#fff',
   },
   button: {
     marginTop: 10,
@@ -257,23 +237,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
   },
-  radioContainer: {
-    flexDirection: "row",
-    marginBottom: 16,
-  },
-  radioButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    marginRight: 10,
-  },
-  radioSelected: {
-    backgroundColor: "#42CFE0",
-    borderColor: "#42CFE0",
-  },
-  radioText: {
-    color: "#707070",
-  },
 });
+
