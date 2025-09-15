@@ -3,8 +3,6 @@ import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ListRenderIt
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Cabecalho from '@/src/components/header';
 
-
-
 interface Post {
   id: string;
   title: string;
