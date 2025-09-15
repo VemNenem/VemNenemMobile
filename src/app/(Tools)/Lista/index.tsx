@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Cabecalho from '@/src/components/headertools';
-import Popup from '@/src/components/popup'; // ajuste o caminho se necessário
+import Popup from '@/src/components/popup'; 
 
 const dadosIniciais = [
   { id: '1', nome: 'Chá de bebê', quantidade: 20 },
@@ -20,19 +20,17 @@ const dadosIniciais = [
 export default function Inicio() {
   const [listas, setListas] = useState(dadosIniciais);
   const [popupVisible, setPopupVisible] = useState(false);
-  const [categoria, setCategoria] = useState(''); // Estado para controlar o texto do input do Popup
-
-  // Função para adicionar nova categoria na lista
+  const [categoria, setCategoria] = useState(''); 
   const handleAddCategoria = (nome: string) => {
-    if (!nome.trim()) return; // evita adicionar categoria vazia
+    if (!nome.trim()) return;
     const novaLista = {
       id: (listas.length + 1).toString(),
       nome,
       quantidade: 0,
     };
     setListas([...listas, novaLista]);
-    setCategoria(''); // limpa input do popup
-    setPopupVisible(false); // fecha popup
+    setCategoria('');
+    setPopupVisible(false); 
   };
 
   const renderItem = ({ item }: { item: typeof listas[0] }) => (

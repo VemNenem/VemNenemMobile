@@ -1,6 +1,15 @@
 import React from 'react';
-import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ListRenderItem, SafeAreaView } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { 
+  View, 
+  Text, 
+  Image, 
+  FlatList, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ListRenderItem, 
+  SafeAreaView 
+} from 'react-native';
+import { router } from 'expo-router';
 import Cabecalho from '@/src/components/header';
 
 interface Post {
@@ -38,8 +47,12 @@ const posts: Post[] = [
 ];
 
 const Blog = () => {
+
   const renderItem: ListRenderItem<Post> = ({ item }) => (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => router.push(`/(posts)/pagepost?id=${item.id}`)} 
+    >
       <Image source={item.image} style={styles.image} />
       <View style={styles.textContainer}>
         <Text style={styles.title}>{item.title}</Text>
@@ -51,13 +64,10 @@ const Blog = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Header */}
         <Cabecalho
           title="Blog"
           route="../(social)/perfil"
         />
-
-        {/* Lista de posts */}
         <FlatList
           data={posts}
           keyExtractor={(item) => item.id}
@@ -72,46 +82,6 @@ const Blog = () => {
 export default Blog;
 
 const styles = StyleSheet.create({
-
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    height: 60,
-    marginBottom: 20,
-  },
-  iconContainer: {
-    width: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#42CFE0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  titleContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#707070',
-  },
-  profileIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#ffffff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
@@ -139,6 +109,11 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#707070',
   },
   author: {
     fontSize: 12,

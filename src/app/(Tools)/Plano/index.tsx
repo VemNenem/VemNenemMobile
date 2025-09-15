@@ -71,7 +71,6 @@ export default function PlanoDeParto() {
           <Text style={styles.tituloSecao}>PLANO DE PARTO</Text>
           <Text style={styles.dados}>NOME DO BEBÊ: LUCAS</Text>
           <Text style={styles.dados}>NOME DA MÃE: JULIA OLIVEIRA</Text>
-          <Text style={styles.dados}>NOME DO PAI: BRYAN HENRIQUE</Text>
         </View>
 
         <View style={styles.section}>

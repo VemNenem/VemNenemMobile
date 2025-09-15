@@ -8,7 +8,7 @@ interface Tool {
   id: string;
   name: string;
   icon: keyof typeof Ionicons.glyphMap;
-  route: any; // Usamos 'any' como solução prática para o Expo Router
+  route: any;
 }
 
 const tools: Tool[] = [
