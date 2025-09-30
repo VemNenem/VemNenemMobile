@@ -30,9 +30,33 @@ const parto: Item[] = [
   { id: '8', texto: 'Elementum nibh commodo auctor neque.', checked: false },
 ];
 
+const posParto: Item[] = [
+  { id: '9', texto: 'Elementum nibh commodo auctor neque.', checked: false },
+  { id: '10', texto: 'Elementum nibh commodo auctor neque.', checked: false },
+  { id: '11', texto: 'Elementum nibh commodo auctor neque.', checked: false },
+  { id: '12', texto: 'Elementum nibh commodo auctor neque.', checked: false },
+];
+
+const cuidadosBebe: Item[] = [
+  { id: '13', texto: 'Elementum nibh commodo auctor neque.', checked: false },
+  { id: '14', texto: 'Elementum nibh commodo auctor neque.', checked: false },
+  { id: '15', texto: 'Elementum nibh commodo auctor neque.', checked: false },
+  { id: '16', texto: 'Elementum nibh commodo auctor neque.', checked: false },
+];
+
+const cesaria: Item[] = [
+  { id: '17', texto: 'Elementum nibh commodo auctor neque.', checked: false },
+  { id: '18', texto: 'Elementum nibh commodo auctor neque.', checked: false },
+  { id: '19', texto: 'Elementum nibh commodo auctor neque.', checked: false },
+  { id: '20', texto: 'Elementum nibh commodo auctor neque.', checked: false },
+];
+
 export default function PlanoDeParto() {
   const [trabalho, setTrabalho] = useState(trabalhoDeParto);
   const [partoItems, setPartoItems] = useState(parto);
+  const [posPartoItems, setPosPartoItems] = useState(posParto);
+  const [cuidadosBebeItems, setCuidadosBebeItems] = useState(cuidadosBebe);
+  const [cesariaItems, setCesariaItems] = useState(cesaria);
 
   const toggleCheck = (
     list: Item[],
@@ -85,22 +109,27 @@ export default function PlanoDeParto() {
 
         <View style={styles.section}>
           <Text style={styles.tituloSecao}>PÓS PARTO</Text>
-          {partoItems.map((item) => renderItem(item, partoItems, setPartoItems))}
+          {posPartoItems.map((item) => renderItem(item, posPartoItems, setPosPartoItems))}
         </View>
 
         <View style={styles.section}>
           <Text style={styles.tituloSecao}>CUIDADOS COM O BEBÊ</Text>
-          {partoItems.map((item) => renderItem(item, partoItems, setPartoItems))}
+          {cuidadosBebeItems.map((item) => renderItem(item, cuidadosBebeItems, setCuidadosBebeItems))}
         </View>
 
         <View style={styles.section}>
           <Text style={styles.tituloSecao}>CESÁRIA</Text>
-          {partoItems.map((item) => renderItem(item, partoItems, setPartoItems))}
+          {cesariaItems.map((item) => renderItem(item, cesariaItems, setCesariaItems))}
         </View>
 
          <TouchableOpacity style={styles.botao}>
-  <Text style={styles.textoBotao}>BAIXAR</Text>
-</TouchableOpacity>
+          <Text style={styles.textoBotao}>BAIXAR</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.textoAdicionar}>
+          Para adicionar outros itens ao seu plano de parto, entre em contato em nosso email suporte@vemnenem.app.
+        </Text>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -155,5 +184,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textTransform: 'uppercase',
     fontSize: 16,
+  },
+  textoAdicionar: {
+    paddingVertical: 20,
+    textAlign: "center",
   },
 });
