@@ -301,9 +301,6 @@ export default function TelaAgenda() {
             </View>
           )}
 
-          <TouchableOpacity style={styles.botaoAdicionar} onPress={abrirModalAdicionar}>
-            <Text style={styles.textoBotaoAdicionar}>Adicionar</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
 
