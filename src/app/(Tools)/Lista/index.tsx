@@ -8,33 +8,60 @@ import {
   FlatList,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useRouter } from 'expo-router';
 import Cabecalho from '@/src/components/headertools';
-import Popup from '@/src/components/popup'; 
+import Popup from '@/src/components/popup';
 
-const dadosIniciais = [
+interface Lista {
+  id: string;
+  nome: string;
+  quantidade: number;
+}
+
+const dadosIniciais: Lista[] = [
   { id: '1', nome: 'Chá de bebê', quantidade: 20 },
   { id: '2', nome: 'Enxoval', quantidade: 30 },
-  { id: '3', nome: 'Casa', quantidade: 15 },
+  { id: '3', nome: 'Quarto', quantidade: 5 },
+  { id: '4', nome: 'Higiene', quantidade: 0 },
 ];
 
-export default function Inicio() {
-  const [listas, setListas] = useState(dadosIniciais);
+export default function ListasScreen() {
+  const router = useRouter();
+  const [listas, setListas] = useState<Lista[]>(dadosIniciais);
   const [popupVisible, setPopupVisible] = useState(false);
-  const [categoria, setCategoria] = useState(''); 
+  const [categoria, setCategoria] = useState('');
+
   const handleAddCategoria = (nome: string) => {
     if (!nome.trim()) return;
-    const novaLista = {
-      id: (listas.length + 1).toString(),
-      nome,
+    
+    const novaLista: Lista = {
+      id: Date.now().toString(),
+      nome: nome.trim(),
       quantidade: 0,
     };
+    
     setListas([...listas, novaLista]);
     setCategoria('');
-    setPopupVisible(false); 
+    setPopupVisible(false);
   };
 
-  const renderItem = ({ item }: { item: typeof listas[0] }) => (
-    <TouchableOpacity style={styles.card}>
+  const handleSelectLista = (lista: Lista) => {
+    router.push({
+      pathname: '/detalhelista',
+      params: {
+        id: lista.id,
+        nome: lista.nome,
+        quantidade: lista.quantidade,
+      },
+    });
+  };
+
+  const renderItem = ({ item }: { item: Lista }) => (
+    <TouchableOpacity 
+      style={styles.card}
+      onPress={() => handleSelectLista(item)}
+      activeOpacity={0.7}
+    >
       <Text style={styles.nome}>{item.nome}</Text>
       <Text style={styles.quantidade}>{item.quantidade}</Text>
     </TouchableOpacity>
@@ -43,11 +70,15 @@ export default function Inicio() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Cabecalho title="Lista" />
+        <Cabecalho title="Listas" />
 
         <View style={styles.header}>
           <Text style={styles.titulo}>Minhas listas</Text>
-          <TouchableOpacity onPress={() => setPopupVisible(true)}>
+          <TouchableOpacity
+            onPress={() => setPopupVisible(true)}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
             <Ionicons name="add-circle-outline" size={24} color="#000" />
           </TouchableOpacity>
         </View>
@@ -56,21 +87,10 @@ export default function Inicio() {
           data={listas}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
-          scrollEnabled={false}
-          contentContainerStyle={{ gap: 12, paddingBottom: 40 }}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
         />
       </View>
-
-      <Popup
-        visible={popupVisible}
-        onClose={() => {
-          setPopupVisible(false);
-          setCategoria(''); // limpa input ao fechar popup
-        }}
-        onSubmit={() => handleAddCategoria(categoria)}
-        value={categoria}
-        onChangeText={setCategoria}
-      />
     </SafeAreaView>
   );
 }
@@ -90,32 +110,40 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
+    marginTop: 8,
   },
   titulo: {
     fontSize: 16,
     color: '#333',
+    fontWeight: '400',
+  },
+  listContent: {
+    gap: 12,
+    paddingBottom: 20,
   },
   card: {
     flexDirection: 'row',
     backgroundColor: '#fff',
     borderRadius: 12,
-    overflow: 'hidden',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#EFEFEF',
     padding: 16,
     justifyContent: 'space-between',
     shadowColor: '#000',
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   nome: {
     fontSize: 15,
     color: '#333',
+    fontWeight: '400',
   },
   quantidade: {
     fontSize: 15,
     color: '#999',
+    fontWeight: '400',
   },
 });
