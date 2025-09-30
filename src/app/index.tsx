@@ -41,7 +41,7 @@ export default function Login() {
             style={styles.input}
             placeholderTextColor="#707070"
           />
-          
+
           <Text style={styles.inputLabel}>Senha</Text>
           <View style={styles.passwordContainer}>
             <TextInput
@@ -61,7 +61,15 @@ export default function Login() {
             <Text style={styles.link}>Esqueci a senha</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.loginButton} onPress={() => router.push("/(main)/inicio")}>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() =>
+              router.push({
+                pathname: "/(Auth)/splash-hello",
+                params: { userName: email.split("@")[0] || "Usuário" },
+              })
+            }
+          >
             <Text style={styles.loginButtonText}>ENTRAR</Text>
           </TouchableOpacity>
 

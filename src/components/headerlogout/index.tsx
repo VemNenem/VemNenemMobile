@@ -27,7 +27,7 @@ export default function CabecalhoLogout({
         {
           text: 'Sair',
           style: 'destructive',
-          onPress: () => router.replace('/'), // sua tela inicial ou login
+          onPress: () => router.replace('/'),
         },
       ],
       { cancelable: true }
@@ -37,7 +37,6 @@ export default function CabecalhoLogout({
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
       <View style={[styles.header, { backgroundColor }]}>
-        {/* Ícone perfil esquerda */}
         <View style={styles.iconContainer}>
           <TouchableOpacity onPress={() => router.push(route)} accessibilityLabel="Perfil do usuário">
             <View style={styles.iconCircle}>
