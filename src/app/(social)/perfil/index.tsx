@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import DropDownPicker from 'react-native-dropdown-picker';
 import {
   View,
   Text,
@@ -9,7 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import CabecalhoComLogout from '@/src/components/headerlogout';
@@ -20,15 +19,11 @@ const Perfil = () => {
   const [dpp, setDpp] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [sexoBebe, setSexoBebe] = useState('');
-  const [openDropdown, setOpenDropdown] = useState(false);
-  const [sexoOptions, setSexoOptions] = useState([
-    { label: 'Masculino', value: 'Masculino' },
-    { label: 'Feminino', value: 'Feminino' },
-  ]);
   const [nomeBebe, setNomeBebe] = useState('');
   const [nomePai, setNomePai] = useState('');
 
-  const handleDateChange = (_event: any, selectedDate?: Date) => {
+  // Função para tratar a mudança de data
+  const handleDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowDatePicker(false);
     if (selectedDate) {
       setDpp(selectedDate);
@@ -58,6 +53,7 @@ const Perfil = () => {
           enableOnAndroid={true}
         >
           <View style={styles.formBox}>
+            {/* Nome */}
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>Nome</Text>
               <TextInput
@@ -69,6 +65,7 @@ const Perfil = () => {
               />
             </View>
 
+            {/* DPP */}
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>DPP (Data Provável do Parto)</Text>
               <TouchableOpacity onPress={() => setShowDatePicker(true)}>
@@ -78,9 +75,10 @@ const Perfil = () => {
                   placeholder="DD/MM/AAAA"
                   placeholderTextColor="#aaa"
                   editable={false}
-                  pointerEvents="none"
                 />
               </TouchableOpacity>
+
+              {/* iOS e Android */}
               {showDatePicker && (
                 <DateTimePicker
                   value={dpp || new Date()}
@@ -92,25 +90,33 @@ const Perfil = () => {
               )}
             </View>
 
-            {/* DropDown com zIndex maior para não causar erro */}
-            <View style={[styles.fieldContainer, { zIndex: 3000 }]}>
+            {/* Sexo do bebê com botões de rádio */}
+            <View style={styles.fieldContainer}>
               <Text style={styles.label}>Sexo do bebê</Text>
-              <DropDownPicker
-                open={openDropdown}
-                value={sexoBebe}
-                items={sexoOptions}
-                setOpen={setOpenDropdown}
-                setValue={setSexoBebe}
-                setItems={setSexoOptions}
-                placeholder="Selecione o sexo"
-                style={styles.dropdown}
-                dropDownContainerStyle={styles.dropdownContainer}
-                zIndex={3000}
-                zIndexInverse={1000}
-                listMode="SCROLLVIEW"
-              />
+              <View style={styles.radioContainer}>
+                {['Masculino', 'Feminino'].map((sexo) => (
+                  <TouchableOpacity
+                    key={sexo}
+                    style={[
+                      styles.radioButton,
+                      sexoBebe === sexo && styles.radioSelected,
+                    ]}
+                    onPress={() => setSexoBebe(sexo)}
+                  >
+                    <Text
+                      style={[
+                        styles.radioText,
+                        sexoBebe === sexo && { color: '#fff' },
+                      ]}
+                    >
+                      {sexo}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
 
+            {/* Nome do bebê */}
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>Nome do bebê</Text>
               <TextInput
@@ -122,6 +128,7 @@ const Perfil = () => {
               />
             </View>
 
+            {/* Nome do pai */}
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>Nome do pai</Text>
               <TextInput
@@ -133,7 +140,11 @@ const Perfil = () => {
               />
             </View>
 
-            <TouchableOpacity style={styles.button} onPress={() => router.push('/senha')}>
+            {/* Botões */}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => router.push('/senha')}
+            >
               <Text style={styles.buttonText}>Alterar senha</Text>
             </TouchableOpacity>
 
@@ -193,14 +204,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     backgroundColor: '#fff',
   },
-  dropdown: {
+  radioContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  radioButton: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 10,
-    backgroundColor: '#fff',
+    marginRight: 10,
   },
-  dropdownContainer: {
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
+  radioSelected: {
+    backgroundColor: '#42CFE0',
+    borderColor: '#42CFE0',
+  },
+  radioText: {
+    fontSize: 16,
+    color: '#000',
   },
   button: {
     marginTop: 10,
@@ -238,4 +261,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
