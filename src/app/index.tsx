@@ -7,10 +7,13 @@ import {
   StyleSheet,
   Image,
   ImageBackground,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { login } from "../service/loginService";
 
 
 export default function Login() {
@@ -18,7 +21,48 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
-  const [tipo, setTipo] = useState("mamãe");
+  const [lembrarMe, setLembrarMe] = useState(false);
+  const [carregando, setCarregando] = useState(false);
+
+  const handleLogin = async () => {
+    // Validações
+    if (!email.trim()) {
+      Alert.alert("Erro", "Por favor, digite seu e-mail.");
+      return;
+    }
+
+    if (!senha.trim()) {
+      Alert.alert("Erro", "Por favor, digite sua senha.");
+      return;
+    }
+
+    setCarregando(true);
+
+    try {
+      const resultado = await login(email.trim(), senha, lembrarMe);
+
+      if (resultado.success) {
+        // Login bem-sucedido
+        router.push({
+          pathname: "/(Auth)/splash-hello",
+          params: {
+            userName: resultado.user?.username?.split("@")[0] || email.split("@")[0] || "Usuário"
+          },
+        });
+      } else {
+        // Erro no login
+        Alert.alert(
+          "Erro no Login",
+          resultado.message || "Não foi possível fazer login. Verifique suas credenciais."
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      Alert.alert("Erro", "Ocorreu um erro inesperado. Tente novamente.");
+    } finally {
+      setCarregando(false);
+    }
+  };
 
   return (
     <ImageBackground
@@ -62,15 +106,28 @@ export default function Login() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.loginButton}
-            onPress={() =>
-              router.push({
-                pathname: "/(Auth)/splash-hello",
-                params: { userName: email.split("@")[0] || "Usuário" },
-              })
-            }
+            style={styles.rememberMeContainer}
+            onPress={() => setLembrarMe(!lembrarMe)}
+            activeOpacity={0.7}
           >
-            <Text style={styles.loginButtonText}>ENTRAR</Text>
+            <View style={styles.checkbox}>
+              {lembrarMe && (
+                <Ionicons name="checkmark" size={18} color="#42CFE0" />
+              )}
+            </View>
+            <Text style={styles.rememberMeText}>Lembrar de mim</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.loginButton, carregando && styles.loginButtonDisabled]}
+            onPress={handleLogin}
+            disabled={carregando}
+          >
+            {carregando ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.loginButtonText}>ENTRAR</Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.registerButton} onPress={() => router.push("/(Auth)/cadastro")}>
@@ -191,6 +248,27 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
     fontWeight: "600",
   },
+  rememberMeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    marginBottom: 20,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderWidth: 2,
+    borderColor: "#42CFE0",
+    borderRadius: 4,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  rememberMeText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: "#707070",
+  },
   loginButton: {
     backgroundColor: "#42CFE0",
     borderRadius: 10,
@@ -198,6 +276,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
     marginBottom: 10,
+  },
+  loginButtonDisabled: {
+    opacity: 0.6,
   },
   loginButtonText: {
     color: "#fff",
