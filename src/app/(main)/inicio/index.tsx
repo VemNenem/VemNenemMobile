@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,16 +7,92 @@ import {
   ImageBackground,
   TouchableOpacity,
   SafeAreaView,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { shadow } from '@/global/shadow';
 import Cabecalho from '@/src/components/header';
 import { router } from 'expo-router';
+import { getHome, HomeData } from '@/src/service/inicioService';
+import { getStoredJWT } from '@/src/service/loginService';
 
 
 export default function Inicio() {
   const navigation = useNavigation();
+  const [carregando, setCarregando] = useState(true);
+  const [dados, setDados] = useState<HomeData | null>(null);
+
+  useEffect(() => {
+    carregarDadosHome();
+  }, []);
+
+  const carregarDadosHome = async () => {
+    setCarregando(true);
+    try {
+      // Buscar o JWT do usuário logado
+      const jwt = await getStoredJWT();
+
+      if (!jwt) {
+        Alert.alert('Erro', 'Você precisa estar logado para acessar esta página.');
+        router.replace('/');
+        return;
+      }
+
+      // Buscar dados da home
+      const resultado = await getHome(jwt);
+
+      if (resultado.success && resultado.data) {
+        setDados(resultado.data);
+      } else {
+        Alert.alert('Erro', resultado.message || 'Não foi possível carregar os dados.');
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados da home:', error);
+      Alert.alert('Erro', 'Ocorreu um erro ao carregar os dados.');
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  const formatarData = (dataString: string): string => {
+    const data = new Date(dataString);
+    const hoje = new Date();
+    const amanha = new Date(hoje);
+    amanha.setDate(amanha.getDate() + 1);
+
+    // Resetar horas para comparação apenas de datas
+    hoje.setHours(0, 0, 0, 0);
+    amanha.setHours(0, 0, 0, 0);
+    data.setHours(0, 0, 0, 0);
+
+    if (data.getTime() === hoje.getTime()) {
+      return 'Hoje';
+    } else if (data.getTime() === amanha.getTime()) {
+      return 'Amanhã';
+    } else {
+      return data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    }
+  };
+
+  const calcularProgresso = (): number => {
+    if (!dados) return 0;
+    const totalSemanas = dados.currentWeek + dados.remaining.weeks;
+    return totalSemanas > 0 ? (dados.currentWeek / totalSemanas) * 100 : 0;
+  };
+
+  if (carregando) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <Cabecalho title="Inicio" route="../(social)/perfil" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#42CFE0" />
+          <Text style={styles.loadingText}>Carregando...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -35,7 +111,7 @@ export default function Inicio() {
           >
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>Parabéns!</Text>
-              <Text style={styles.weekNumber}>26</Text>
+              <Text style={styles.weekNumber}>{dados?.currentWeek || 0}</Text>
               <Text style={styles.weekLabel}>SEMANAS</Text>
             </View>
           </ImageBackground>
@@ -46,7 +122,9 @@ export default function Inicio() {
           style={[shadow.default, styles.remainingCard, styles.cardWithBorder]}
         >
           <Text style={styles.remainingText}>Faltam apenas</Text>
-          <Text style={styles.remainingTextBold}>13 semanas e 5 dias!</Text>
+          <Text style={styles.remainingTextBold}>
+            {dados?.remaining.weeks || 0} semanas e {dados?.remaining.days || 0} dias!
+          </Text>
           <TouchableOpacity onPress={() => router.push('/(social)/perfil')}>
             <Text style={styles.editText}>Editar</Text>
           </TouchableOpacity>
@@ -61,7 +139,7 @@ export default function Inicio() {
             }}
           >
             <View
-              style={{ width: '50%', height: '100%', backgroundColor: '#42CFE0' }}
+              style={{ width: `${calcularProgresso()}%`, height: '100%', backgroundColor: '#42CFE0' }}
             />
           </View>
           <View style={styles.divider} />
@@ -75,15 +153,25 @@ export default function Inicio() {
           style={[styles.remindersContainer, styles.cardWithBorder]}
         >
           <Text style={styles.sectionTitle}>Lembretes</Text>
-          <View style={styles.reminderItem}>
-            <View style={styles.reminderHeader}>
-              <Text style={styles.reminderTitle}>Título</Text>
-              <Text style={styles.reminderDate}>Hoje</Text>
+          {dados?.schedule && dados.schedule.length > 0 ? (
+            dados.schedule.map((lembrete) => (
+              <View key={lembrete.id} style={styles.reminderItem}>
+                <View style={styles.reminderHeader}>
+                  <Text style={styles.reminderTitle}>{lembrete.name}</Text>
+                  <Text style={styles.reminderDate}>
+                    {formatarData(lembrete.date)} {lembrete.time && `- ${lembrete.time}`}
+                  </Text>
+                </View>
+                <Text style={styles.reminderDescription}>
+                  {lembrete.description}
+                </Text>
+              </View>
+            ))
+          ) : (
+            <View style={styles.reminderItem}>
+              <Text style={styles.noRemindersText}>Nenhum lembrete agendado</Text>
             </View>
-            <Text style={styles.reminderDescription}>
-              Descrição: Lorem ipsum dolor sit amet, consectetur adipiscint ipsum dolor
-            </Text>
-          </View>
+          )}
         </LinearGradient>
       </ScrollView>
     </SafeAreaView>
@@ -203,5 +291,22 @@ const styles = StyleSheet.create({
   reminderDescription: {
     color: '#555',
     fontSize: 14,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    color: '#707070',
+    fontSize: 16,
+  },
+  noRemindersText: {
+    color: '#707070',
+    fontSize: 14,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
