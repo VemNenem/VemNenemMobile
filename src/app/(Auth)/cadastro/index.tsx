@@ -8,13 +8,17 @@ import {
   Image,
   ImageBackground,
   ScrollView,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { createClient } from "../../../service/cadastroService";
 
 export default function Cadastro() {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nome: "",
     email: "",
@@ -32,11 +36,56 @@ export default function Cadastro() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
+  // Converte data de DD/MM/YYYY para YYYY-MM-DD
+  const convertDateToISO = (dateString: string): string => {
+    if (!dateString) return "";
+    const [day, month, year] = dateString.split("/");
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleSubmit = async () => {
     if (step === 1) {
+      // Validação básica do step 1
+      if (!formData.nome || !formData.email || !formData.senha) {
+        Alert.alert("Erro", "Preencha todos os campos obrigatórios");
+        return;
+      }
       setStep(2);
     } else {
-      router.push("/(main)/inicio");
+      // Validação básica do step 2
+      if (!formData.dpp || !formData.sexoBebe) {
+        Alert.alert("Erro", "Preencha todos os campos obrigatórios");
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const result = await createClient({
+          name: formData.nome,
+          email: formData.email,
+          password: formData.senha,
+          probableDateOfDelivery: convertDateToISO(formData.dpp),
+          babyGender: formData.sexoBebe,
+          babyName: formData.nomeBebe,
+          fatherName: formData.nomePai,
+        });
+
+        if (result.success) {
+          Alert.alert("Sucesso", "Cadastro realizado com sucesso!", [
+            {
+              text: "OK",
+              onPress: () => router.push("/(main)/inicio"),
+            },
+          ]);
+        } else {
+          Alert.alert("Erro", result.message || "Erro ao realizar cadastro");
+        }
+      } catch (error) {
+        Alert.alert("Erro", "Erro inesperado ao realizar cadastro");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -167,15 +216,24 @@ export default function Cadastro() {
           )}
 
           <View style={styles.buttonsContainer}>
-            <TouchableOpacity style={styles.continueButton} onPress={handleSubmit}>
-              <Text style={styles.continueButtonText}>
-                {step === 1 ? "AVANÇAR" : "FINALIZAR CADASTRO"}
-              </Text>
+            <TouchableOpacity
+              style={[styles.continueButton, loading && styles.buttonDisabled]}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.continueButtonText}>
+                  {step === 1 ? "AVANÇAR" : "FINALIZAR CADASTRO"}
+                </Text>
+              )}
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.backButton}
               onPress={() => (step === 1 ? router.back() : setStep(1))}
+              disabled={loading}
             >
               <Text style={styles.backButtonText}>VOLTAR</Text>
             </TouchableOpacity>
@@ -288,6 +346,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     alignItems: "center",
     marginBottom: 10,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   backButtonText: {
     color: "#42CFE0",
