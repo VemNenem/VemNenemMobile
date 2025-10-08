@@ -7,21 +7,91 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import CabecalhoComLogout from '@/src/components/headerlogout';
 import { Ionicons } from '@expo/vector-icons';
 import { RelativePathString, router } from 'expo-router';
+import { changePassword } from '@/src/service/perfilService';
+import { getStoredJWT } from '@/src/service/loginService';
 
 const AlterarSenha = () => {
   const [senhaAtual, setSenhaAtual] = useState('');
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [alterando, setAlterando] = useState(false);
 
   const [mostrarSenhaAtual, setMostrarSenhaAtual] = useState(false);
   const [mostrarNovaSenha, setMostrarNovaSenha] = useState(false);
   const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
+
+  const handleAlterarSenha = async () => {
+    // Validações
+    if (!senhaAtual.trim()) {
+      Alert.alert('Erro', 'Por favor, digite sua senha atual.');
+      return;
+    }
+
+    if (!novaSenha.trim()) {
+      Alert.alert('Erro', 'Por favor, digite a nova senha.');
+      return;
+    }
+
+    if (!confirmarSenha.trim()) {
+      Alert.alert('Erro', 'Por favor, confirme a nova senha.');
+      return;
+    }
+
+    if (novaSenha !== confirmarSenha) {
+      Alert.alert('Erro', 'A nova senha e a confirmação não coincidem.');
+      return;
+    }
+
+    if (novaSenha.length < 8) {
+      Alert.alert('Erro', 'A nova senha deve ter pelo menos 8 caracteres.');
+      return;
+    }
+
+    setAlterando(true);
+    try {
+      const jwt = await getStoredJWT();
+
+      if (!jwt) {
+        Alert.alert('Erro', 'Sessão expirada. Faça login novamente.');
+        router.replace('/');
+        return;
+      }
+
+      const resultado = await changePassword(jwt, {
+        currentPassword: senhaAtual,
+        password: novaSenha,
+        passwordConfirmation: confirmarSenha,
+      });
+
+      if (resultado.success) {
+        Alert.alert(
+          'Sucesso',
+          resultado.message || 'Senha alterada com sucesso!',
+          [
+            {
+              text: 'OK',
+              onPress: () => router.back(),
+            },
+          ]
+        );
+      } else {
+        Alert.alert('Erro', resultado.message || 'Não foi possível alterar a senha.');
+      }
+    } catch (error) {
+      console.error('Erro ao alterar senha:', error);
+      Alert.alert('Erro', 'Ocorreu um erro ao alterar a senha.');
+    } finally {
+      setAlterando(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -34,7 +104,6 @@ const AlterarSenha = () => {
           <CabecalhoComLogout
             title="Alterar senha"
             route={"inicio" as RelativePathString}
-            rightIcon="log-out-outline"
             backgroundColor="#42CFE0"
             textColor="#fff"
           />
@@ -97,8 +166,16 @@ const AlterarSenha = () => {
               </View>
             </View>
 
-            <TouchableOpacity style={styles.primaryButton}>
-              <Text style={styles.primaryButtonText}>ALTERAR SENHA</Text>
+            <TouchableOpacity
+              style={[styles.primaryButton, alterando && styles.primaryButtonDisabled]}
+              onPress={handleAlterarSenha}
+              disabled={alterando}
+            >
+              {alterando ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.primaryButtonText}>ALTERAR SENHA</Text>
+              )}
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.secondaryButton} onPress={() => router.back()}>
@@ -174,6 +251,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
+  primaryButtonDisabled: {
+    opacity: 0.6,
+  },
   primaryButtonText: {
     color: '#fff',
     fontWeight: 'bold',
@@ -192,5 +272,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
-  
+
 });
