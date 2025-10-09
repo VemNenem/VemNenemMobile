@@ -17,7 +17,7 @@ interface Item {
 
 export default function DetalheLista() {
   const router = useRouter();
-  const { nome } = useLocalSearchParams(); // Recebe o nome da lista (ex: Quarto)
+  const { nome } = useLocalSearchParams();
   const [itens, setItens] = useState<Item[]>([
     { id: '1', nome: 'Cama', checked: false },
     { id: '2', nome: 'Lixeira', checked: false },

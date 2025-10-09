@@ -111,9 +111,6 @@ export const login = async (
     }
 };
 
-/**
- * Função para renovar o token usando o refreshToken
- */
 export const refreshToken = async (
     refreshTokenValue: string
 ): Promise<RefreshTokenResponse> => {

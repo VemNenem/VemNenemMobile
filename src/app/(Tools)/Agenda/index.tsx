@@ -140,14 +140,14 @@ export default function TelaAgenda() {
     if (!eventoSelecionado) return;
 
     const eventosAtualizados = { ...eventos };
-    
+
     // Encontra e atualiza o evento
     if (eventosAtualizados[dataSelecionada]) {
       const index = eventosAtualizados[dataSelecionada].findIndex(
-        e => e.titulo === eventoSelecionado.titulo && 
-             e.descricao === eventoSelecionado.descricao
+        e => e.titulo === eventoSelecionado.titulo &&
+          e.descricao === eventoSelecionado.descricao
       );
-      
+
       if (index !== -1) {
         eventosAtualizados[dataSelecionada][index] = {
           ...eventosAtualizados[dataSelecionada][index],
@@ -166,12 +166,12 @@ export default function TelaAgenda() {
     if (!eventoSelecionado) return;
 
     const eventosAtualizados = { ...eventos };
-    
+
     if (eventosAtualizados[dataSelecionada]) {
       eventosAtualizados[dataSelecionada] = eventosAtualizados[dataSelecionada].filter(
         e => !(e.titulo === eventoSelecionado.titulo && e.descricao === eventoSelecionado.descricao)
       );
-      
+
       // Remove a data se não houver mais eventos
       if (eventosAtualizados[dataSelecionada].length === 0) {
         delete eventosAtualizados[dataSelecionada];
@@ -214,7 +214,7 @@ export default function TelaAgenda() {
     <SafeAreaView style={styles.container}>
       <Cabecalho title="Agenda" />
 
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.conteudoPrincipal}>
         <View style={styles.calendarioContainer}>
           <Calendar
             onDayPress={(day: DateData) => setDataSelecionada(day.dateString)}
@@ -266,7 +266,11 @@ export default function TelaAgenda() {
               </Text>
             </View>
           ) : (
-            <View style={styles.listaEventos}>
+            <ScrollView
+              style={styles.listaEventos}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.listaEventosContent}
+            >
               {eventosDoDia.map((item, index) => (
                 <TouchableOpacity
                   key={index}
@@ -298,13 +302,11 @@ export default function TelaAgenda() {
                   </View>
                 </TouchableOpacity>
               ))}
-            </View>
+            </ScrollView>
           )}
-
         </View>
-      </ScrollView>
+      </View>
 
-      {/* MODAL DE ADICIONAR EVENTO */}
       <ModalAdicionarEvento
         visivel={modalAdicionarVisivel}
         onFechar={() => setModalAdicionarVisivel(false)}
@@ -312,7 +314,6 @@ export default function TelaAgenda() {
         dataEscolhida={dataSelecionada}
       />
 
-      {/* MODAL DE EDITAR EVENTO */}
       <ModalEditarEvento
         visivel={modalEditarVisivel}
         onFechar={() => {
@@ -324,7 +325,6 @@ export default function TelaAgenda() {
         descricaoInicial={eventoSelecionado?.descricao || ""}
       />
 
-      {/* MODAL DE VISUALIZAR EVENTO */}
       <Modal
         visible={modalVisivel}
         animationType="slide"
@@ -392,10 +392,10 @@ export default function TelaAgenda() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#fff",
   },
-  scrollContainer: {
-    flexGrow: 1,
+  conteudoPrincipal: {
+    flex: 1,
   },
   calendarioContainer: {
     backgroundColor: "#fff",
@@ -411,7 +411,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     padding: 20,
-    marginTop: -10,
   },
   eventosHeader: {
     flexDirection: "row",
@@ -441,7 +440,7 @@ const styles = StyleSheet.create({
     color: "rgba(255, 255, 255, 0.8)",
   },
   listaEventos: {
-    marginBottom: 20,
+    flex: 1,
   },
   cartaoEvento: {
     backgroundColor: "#ffffff",
@@ -505,7 +504,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  // ESTILOS DO MODAL
+  listaEventosContent: {
+    paddingBottom: 16,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",

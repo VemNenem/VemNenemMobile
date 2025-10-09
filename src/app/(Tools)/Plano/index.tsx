@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,9 +6,12 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Cabecalho from '@/src/components/headertools';
+import { getMyData } from '@/src/service/perfilService';
+import { getStoredJWT } from '@/src/service/loginService';
 
 interface Item {
   id: string;
@@ -57,6 +60,49 @@ export default function PlanoDeParto() {
   const [posPartoItems, setPosPartoItems] = useState(posParto);
   const [cuidadosBebeItems, setCuidadosBebeItems] = useState(cuidadosBebe);
   const [cesariaItems, setCesariaItems] = useState(cesaria);
+  
+  // Estados para os dados da API
+  const [nomeMae, setNomeMae] = useState('');
+  const [nomeBebe, setNomeBebe] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    carregarDados();
+  }, []);
+
+  const carregarDados = async () => {
+    try {
+      setLoading(true);
+      
+      // Pegar o token usando a função do loginService
+      const token = await getStoredJWT();
+      
+      console.log('Token recuperado:', token ? 'Token existe' : 'Token não encontrado');
+      
+      if (token) {
+        const response = await getMyData(token);
+        
+        console.log('Response da API:', response);
+        console.log('Dados retornados:', response.data);
+        
+        if (response.success && response.data) {
+          console.log('Nome da mãe:', response.data.name);
+          console.log('Nome do bebê:', response.data.babyName);
+          
+          setNomeMae(response.data.name || '');
+          setNomeBebe(response.data.babyName || '');
+        } else {
+          console.log('Erro na resposta:', response.message);
+        }
+      } else {
+        console.log('Token não encontrado no AsyncStorage');
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const toggleCheck = (
     list: Item[],
@@ -86,15 +132,30 @@ export default function PlanoDeParto() {
     </View>
   );
 
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <Cabecalho title="Plano de Parto" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#42cfe0" />
+          <Text style={styles.loadingText}>Carregando dados...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      <Cabecalho title="Plano de Parto" />
       <ScrollView contentContainerStyle={styles.container}>
-        <Cabecalho title="Plano de Parto" />
-
         <View style={styles.section}>
           <Text style={styles.tituloSecao}>PLANO DE PARTO</Text>
-          <Text style={styles.dados}>NOME DO BEBÊ: LUCAS</Text>
-          <Text style={styles.dados}>NOME DA MÃE: JULIA OLIVEIRA</Text>
+          <Text style={styles.dados}>
+            NOME DO BEBÊ: {nomeBebe.toUpperCase() || 'NÃO INFORMADO'}
+          </Text>
+          <Text style={styles.dados}>
+            NOME DA MÃE: {nomeMae.toUpperCase() || 'NÃO INFORMADO'}
+          </Text>
         </View>
 
         <View style={styles.section}>
@@ -143,6 +204,17 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     paddingBottom: 40,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
   },
   section: {
     marginBottom: 24,
