@@ -51,25 +51,50 @@ type EventosPorData = {
   [data: string]: Evento[];
 };
 
-const hoje = (() => {
-  const agora = new Date();
-  const brasilTime = new Date(agora.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
-  const ano = brasilTime.getFullYear();
-  const mes = String(brasilTime.getMonth() + 1).padStart(2, '0');
-  const dia = String(brasilTime.getDate()).padStart(2, '0');
-  return `${ano}-${mes}-${dia}`;
-})();
+const getHoje = (): string => {
+  try {
+    const agora = new Date();
+    const ano = agora.getFullYear();
+    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+    const dia = String(agora.getDate()).padStart(2, '0');
+    const dateStr = `${ano}-${mes}-${dia}`;
 
-const getCurrentMonth = () => {
-  const agora = new Date();
-  const brasilTime = new Date(agora.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
-  const ano = brasilTime.getFullYear();
-  const mes = String(brasilTime.getMonth() + 1).padStart(2, '0');
-  return `${ano}-${mes}`;
+    // Valida se a data é válida
+    if (dateStr.includes('NaN')) {
+      console.error('Data inválida gerada:', dateStr);
+      return '2025-01-13'; // fallback
+    }
+
+    return dateStr;
+  } catch (error) {
+    console.error('Erro ao gerar data:', error);
+    return '2025-01-13'; // fallback
+  }
+};
+
+const getCurrentMonth = (): string => {
+  try {
+    const agora = new Date();
+    const ano = agora.getFullYear();
+    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+    const monthStr = `${ano}-${mes}`;
+
+    // Valida se o mês é válido
+    if (monthStr.includes('NaN')) {
+      console.error('Mês inválido gerado:', monthStr);
+      return '2025-01'; // fallback
+    }
+
+    return monthStr;
+  } catch (error) {
+    console.error('Erro ao gerar mês:', error);
+    return '2025-01'; // fallback
+  }
 };
 
 export default function TelaAgenda() {
-  const [dataSelecionada, setDataSelecionada] = useState(hoje);
+  const [hoje] = useState(getHoje());
+  const [dataSelecionada, setDataSelecionada] = useState(getHoje());
   const [eventos, setEventos] = useState<{ [data: string]: Evento[] }>({});
   const [monthSchedule, setMonthSchedule] = useState<{ [date: string]: boolean }>({});
   const [modalVisivel, setModalVisivel] = useState(false);
@@ -78,29 +103,28 @@ export default function TelaAgenda() {
   const [eventoSelecionado, setEventoSelecionado] = useState<Evento | null>(null);
   const [jwt, setJwt] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [currentMonth, setCurrentMonth] = useState(getCurrentMonth()); // YYYY-MM
+  const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
 
   useEffect(() => {
     loadJwtAndFetchData();
   }, []);
 
-  useEffect(() => {
-    if (jwt) {
-      fetchMonthSchedule(currentMonth);
-    }
-  }, [jwt, currentMonth]);
-
-  useEffect(() => {
-    if (jwt && dataSelecionada) {
-      fetchDaySchedule(dataSelecionada);
-    }
-  }, [jwt, dataSelecionada]);
-
   const loadJwtAndFetchData = async () => {
     try {
+
       const token = await getStoredJWT();
+
       if (token) {
+
         setJwt(token);
+
+        const monthToFetch = getCurrentMonth();
+        const dayToFetch = getHoje();
+
+
+        // Busca dados do mês e dia atual assim que tiver o token
+        await fetchMonthSchedule(monthToFetch, token);
+        await fetchDaySchedule(dayToFetch, token);
       } else {
         alert('Erro ao carregar token de autenticação');
       }
@@ -112,9 +136,22 @@ export default function TelaAgenda() {
     }
   };
 
-  const fetchMonthSchedule = async (month: string) => {
+  const fetchMonthSchedule = async (month: string, token?: string) => {
     try {
-      const response = await getMonthSchedule(jwt, month);
+      const jwtToUse = token || jwt;
+      if (!jwtToUse) {
+        console.log('JWT não disponível para fetchMonthSchedule');
+        return;
+      }
+
+
+      // Valida o formato do mês antes de enviar
+      if (!month || month.includes('NaN') || month.length !== 7) {
+        console.error('Mês inválido em fetchMonthSchedule:', month);
+        return;
+      }
+
+      const response = await getMonthSchedule(jwtToUse, month);
       if (response.success && response.data) {
         setMonthSchedule(response.data);
       } else {
@@ -125,9 +162,21 @@ export default function TelaAgenda() {
     }
   };
 
-  const fetchDaySchedule = async (day: string) => {
+  const fetchDaySchedule = async (day: string, token?: string) => {
     try {
-      const response = await getDaySchedule(jwt, day);
+      const jwtToUse = token || jwt;
+      if (!jwtToUse) {
+        console.log('JWT não disponível para fetchDaySchedule');
+        return;
+      }
+
+      // Valida o formato do dia antes de enviar
+      if (!day || day.includes('NaN') || day.length !== 10) {
+        console.error('Dia inválido em fetchDaySchedule:', day);
+        return;
+      }
+
+      const response = await getDaySchedule(jwtToUse, day);
       if (response.success && response.data) {
         const eventosFormatados = response.data.map((schedule: Schedule) => ({
           documentId: schedule.documentId,
@@ -137,15 +186,15 @@ export default function TelaAgenda() {
           time: schedule.time,
         }));
 
-        setEventos({
-          ...eventos,
+        setEventos((prevEventos) => ({
+          ...prevEventos,
           [day]: eventosFormatados,
-        });
+        }));
       } else {
-        setEventos({
-          ...eventos,
+        setEventos((prevEventos) => ({
+          ...prevEventos,
           [day]: [],
-        });
+        }));
       }
     } catch (error) {
       console.error('Erro ao buscar eventos do dia:', error);
@@ -158,33 +207,42 @@ export default function TelaAgenda() {
     // Marca datas com eventos baseado no monthSchedule
     Object.keys(monthSchedule).forEach((dateStr) => {
       // Converte DD/MM/YYYY para YYYY-MM-DD
-      const [day, month, year] = dateStr.split('/');
-      const data = `${year}-${month}-${day}`;
+      const parts = dateStr.split('/');
+      if (parts.length === 3) {
+        const [day, month, year] = parts;
+        const data = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 
-      const isSelected = data === dataSelecionada;
-      const isToday = data === hoje;
-      const hasEvent = monthSchedule[dateStr];
+        const isSelected = data === dataSelecionada;
+        const isToday = data === hoje;
+        const hasEvent = monthSchedule[dateStr];
 
-      marcacoes[data] = {
-        marked: hasEvent,
-        selected: isSelected,
-        customStyles: {
-          container: {
-            backgroundColor: isSelected ? "#42cfe0" : "transparent",
-            borderRadius: 50,
-            width: 32,
-            height: 32,
-            justifyContent: "center",
-            alignItems: "center",
-            borderWidth: isToday && !isSelected ? 2 : 0,
-            borderColor: "#42cfe0",
+        marcacoes[data] = {
+          marked: hasEvent,
+          selected: isSelected,
+          customStyles: {
+            container: {
+              backgroundColor: isSelected ? "#42cfe0" : "transparent",
+              borderRadius: 50,
+              width: 32,
+              height: 32,
+              justifyContent: "center",
+              alignItems: "center",
+              borderWidth: isToday && !isSelected ? 2 : 0,
+              borderColor: "#42cfe0",
+            },
+            text: {
+              color: isSelected ? "white" : isToday ? "#42cfe0" : "#333",
+              fontWeight: isSelected || isToday ? "bold" : "400",
+            },
           },
-          text: {
-            color: isSelected ? "white" : isToday ? "#42cfe0" : "#333",
-            fontWeight: isSelected || isToday ? "bold" : "400",
-          },
-        },
-      };
+        };
+
+        // Adiciona um ponto para indicar que há eventos
+        if (hasEvent && !isSelected) {
+          marcacoes[data].marked = true;
+          marcacoes[data].dotColor = "#42cfe0";
+        }
+      }
     });
 
     // Garante que hoje está sempre marcado
@@ -304,9 +362,21 @@ export default function TelaAgenda() {
   const handleMonthChange = (month: any) => {
     if (month && month.dateString) {
       const newMonth = month.dateString.substring(0, 7); // YYYY-MM
-      if (newMonth && newMonth.includes('-') && newMonth.length === 7) {
+      console.log('handleMonthChange - newMonth:', newMonth);
+
+      if (newMonth && newMonth.includes('-') && newMonth.length === 7 && !newMonth.includes('NaN')) {
         setCurrentMonth(newMonth);
+        fetchMonthSchedule(newMonth);
       }
+    }
+  };
+
+  const handleDayPress = (day: DateData) => {
+    console.log('handleDayPress - dia selecionado:', day.dateString);
+
+    if (day.dateString && !day.dateString.includes('NaN')) {
+      setDataSelecionada(day.dateString);
+      fetchDaySchedule(day.dateString);
     }
   };
 
@@ -322,7 +392,7 @@ export default function TelaAgenda() {
       <View style={styles.conteudoPrincipal}>
         <View style={styles.calendarioContainer}>
           <Calendar
-            onDayPress={(day: DateData) => setDataSelecionada(day.dateString)}
+            onDayPress={handleDayPress}
             onMonthChange={handleMonthChange}
             markingType={"custom"}
             markedDates={marcarDatas()}
@@ -345,6 +415,8 @@ export default function TelaAgenda() {
               textDayFontSize: 14,
               textMonthFontSize: 18,
               textDayHeaderFontSize: 12,
+              dotColor: "#42cfe0",
+              todayDotColor: "#42cfe0",
             }}
             style={styles.calendario}
           />
