@@ -13,9 +13,10 @@ import {
 interface ModalEditarEventoProps {
   visivel: boolean;
   onFechar: () => void;
-  onSalvar: (titulo: string, descricao: string) => void;
+  onSalvar: (titulo: string, descricao: string, time: string) => void;
   tituloInicial: string;
   descricaoInicial: string;
+  timeInicial: string;
 }
 
 export default function ModalEditarEvento({
@@ -24,17 +25,20 @@ export default function ModalEditarEvento({
   onSalvar,
   tituloInicial,
   descricaoInicial,
+  timeInicial,
 }: ModalEditarEventoProps) {
   const [titulo, setTitulo] = useState(tituloInicial);
   const [descricao, setDescricao] = useState(descricaoInicial);
+  const [time, setTime] = useState(timeInicial);
 
   // Atualiza os campos quando o modal abre com novos dados
   useEffect(() => {
     if (visivel) {
       setTitulo(tituloInicial);
       setDescricao(descricaoInicial);
+      setTime(timeInicial);
     }
-  }, [visivel, tituloInicial, descricaoInicial]);
+  }, [visivel, tituloInicial, descricaoInicial, timeInicial]);
 
   const handleSalvar = () => {
     if (titulo.trim() === "") {
@@ -42,7 +46,12 @@ export default function ModalEditarEvento({
       return;
     }
 
-    onSalvar(titulo, descricao);
+    if (time.trim() === "") {
+      alert("Por favor, insira um horário");
+      return;
+    }
+
+    onSalvar(titulo, descricao, time);
   };
 
   const handleVoltar = () => {
@@ -70,6 +79,16 @@ export default function ModalEditarEvento({
               placeholderTextColor="#999"
               value={titulo}
               onChangeText={setTitulo}
+            />
+
+            {/* Campo Horário */}
+            <Text style={styles.label}>Horário</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="HH:mm (ex: 14:30)"
+              placeholderTextColor="#999"
+              value={time}
+              onChangeText={setTime}
             />
 
             {/* Campo Descrição */}

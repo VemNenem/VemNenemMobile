@@ -13,7 +13,7 @@ import {
 interface ModalAdicionarEventoProps {
   visivel: boolean;
   onFechar: () => void;
-  onSalvar: (titulo: string, descricao: string) => void;
+  onSalvar: (titulo: string, descricao: string, time: string) => void;
   dataEscolhida: string;
 }
 
@@ -25,6 +25,7 @@ export default function ModalAdicionarEvento({
 }: ModalAdicionarEventoProps) {
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [time, setTime] = useState("");
 
   const handleSalvar = () => {
     if (titulo.trim() === "") {
@@ -32,14 +33,21 @@ export default function ModalAdicionarEvento({
       return;
     }
 
-    onSalvar(titulo, descricao);
+    if (time.trim() === "") {
+      alert("Por favor, insira um horário");
+      return;
+    }
+
+    onSalvar(titulo, descricao, time);
     setTitulo("");
     setDescricao("");
+    setTime("");
   };
 
   const handleVoltar = () => {
     setTitulo("");
     setDescricao("");
+    setTime("");
     onFechar();
   };
 
@@ -63,6 +71,15 @@ export default function ModalAdicionarEvento({
               placeholderTextColor="#999"
               value={titulo}
               onChangeText={setTitulo}
+            />
+
+            <Text style={styles.label}>Horário</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="HH:mm (ex: 14:30)"
+              placeholderTextColor="#999"
+              value={time}
+              onChangeText={setTime}
             />
 
             <Text style={styles.label}>Descrição</Text>

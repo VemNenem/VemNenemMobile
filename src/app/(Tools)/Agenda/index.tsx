@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -14,6 +14,15 @@ import { Ionicons } from "@expo/vector-icons";
 import Cabecalho from '@/src/components/headertools';
 import ModalAdicionarEvento from '@/src/components/modalevento';
 import ModalEditarEvento from '@/src/components/editarevento';
+import { getStoredJWT } from '@/src/service/loginService';
+import {
+  getMonthSchedule,
+  getDaySchedule,
+  createSchedule,
+  updateSchedule,
+  deleteSchedule,
+  Schedule,
+} from '@/src/service/agendaService';
 
 const windowHeight = Dimensions.get("window").height;
 
@@ -31,9 +40,11 @@ LocaleConfig.locales['ptBR'] = {
 LocaleConfig.defaultLocale = 'ptBR';
 
 interface Evento {
+  documentId: string;
   titulo: string;
   descricao: string;
   data: string;
+  time: string;
 }
 
 type EventosPorData = {
@@ -49,33 +60,113 @@ const hoje = (() => {
   return `${ano}-${mes}-${dia}`;
 })();
 
-const eventosExemplo: EventosPorData = {
-  [hoje]: [
-    {
-      titulo: "Título",
-      descricao: "Lorem ipsum dolor sit amet, con sectetur adipiscin ipsum dolor.\nLorem ipsum dolor sit amet, con sectetur adipiscin ipsum dolor.\nLorem ipsum dolor sit amet, con sectetur adipiscin ipsum dolor.\nLorem ipsum dolor sit amet, con sectetur adipiscin ipsum dolor.\nLorem ipsum dolor sit amet, con sectetur adipiscin ipsum dolor.",
-      data: hoje.split("-").reverse().join("/").substring(0, 5),
-    },
-  ],
+const getCurrentMonth = () => {
+  const agora = new Date();
+  const brasilTime = new Date(agora.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+  const ano = brasilTime.getFullYear();
+  const mes = String(brasilTime.getMonth() + 1).padStart(2, '0');
+  return `${ano}-${mes}`;
 };
 
 export default function TelaAgenda() {
   const [dataSelecionada, setDataSelecionada] = useState(hoje);
-  const [eventos, setEventos] = useState(eventosExemplo);
+  const [eventos, setEventos] = useState<{ [data: string]: Evento[] }>({});
+  const [monthSchedule, setMonthSchedule] = useState<{ [date: string]: boolean }>({});
   const [modalVisivel, setModalVisivel] = useState(false);
   const [modalAdicionarVisivel, setModalAdicionarVisivel] = useState(false);
   const [modalEditarVisivel, setModalEditarVisivel] = useState(false);
   const [eventoSelecionado, setEventoSelecionado] = useState<Evento | null>(null);
+  const [jwt, setJwt] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [currentMonth, setCurrentMonth] = useState(getCurrentMonth()); // YYYY-MM
+
+  useEffect(() => {
+    loadJwtAndFetchData();
+  }, []);
+
+  useEffect(() => {
+    if (jwt) {
+      fetchMonthSchedule(currentMonth);
+    }
+  }, [jwt, currentMonth]);
+
+  useEffect(() => {
+    if (jwt && dataSelecionada) {
+      fetchDaySchedule(dataSelecionada);
+    }
+  }, [jwt, dataSelecionada]);
+
+  const loadJwtAndFetchData = async () => {
+    try {
+      const token = await getStoredJWT();
+      if (token) {
+        setJwt(token);
+      } else {
+        alert('Erro ao carregar token de autenticação');
+      }
+    } catch (error) {
+      console.error('Erro ao carregar token:', error);
+      alert('Erro ao carregar dados de autenticação');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchMonthSchedule = async (month: string) => {
+    try {
+      const response = await getMonthSchedule(jwt, month);
+      if (response.success && response.data) {
+        setMonthSchedule(response.data);
+      } else {
+        console.error('Erro ao buscar eventos do mês:', response.message);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar eventos do mês:', error);
+    }
+  };
+
+  const fetchDaySchedule = async (day: string) => {
+    try {
+      const response = await getDaySchedule(jwt, day);
+      if (response.success && response.data) {
+        const eventosFormatados = response.data.map((schedule: Schedule) => ({
+          documentId: schedule.documentId,
+          titulo: schedule.name,
+          descricao: schedule.description,
+          data: schedule.date.split("-").reverse().join("/").substring(0, 5),
+          time: schedule.time,
+        }));
+
+        setEventos({
+          ...eventos,
+          [day]: eventosFormatados,
+        });
+      } else {
+        setEventos({
+          ...eventos,
+          [day]: [],
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao buscar eventos do dia:', error);
+    }
+  };
 
   const marcarDatas = () => {
     const marcacoes: any = {};
 
-    Object.keys(eventos).forEach((data) => {
+    // Marca datas com eventos baseado no monthSchedule
+    Object.keys(monthSchedule).forEach((dateStr) => {
+      // Converte DD/MM/YYYY para YYYY-MM-DD
+      const [day, month, year] = dateStr.split('/');
+      const data = `${year}-${month}-${day}`;
+
       const isSelected = data === dataSelecionada;
       const isToday = data === hoje;
+      const hasEvent = monthSchedule[dateStr];
 
       marcacoes[data] = {
-        marked: true,
+        marked: hasEvent,
         selected: isSelected,
         customStyles: {
           container: {
@@ -96,6 +187,7 @@ export default function TelaAgenda() {
       };
     });
 
+    // Garante que hoje está sempre marcado
     if (!marcacoes[hoje]) {
       marcacoes[hoje] = {
         selected: hoje === dataSelecionada,
@@ -136,73 +228,86 @@ export default function TelaAgenda() {
     setModalEditarVisivel(true);
   };
 
-  const salvarEdicao = (novoTitulo: string, novaDescricao: string) => {
+  const salvarEdicao = async (novoTitulo: string, novaDescricao: string, novoTime: string) => {
     if (!eventoSelecionado) return;
 
-    const eventosAtualizados = { ...eventos };
+    try {
+      const response = await updateSchedule(jwt, eventoSelecionado.documentId, {
+        name: novoTitulo,
+        description: novaDescricao,
+        date: dataSelecionada,
+        time: novoTime,
+      });
 
-    // Encontra e atualiza o evento
-    if (eventosAtualizados[dataSelecionada]) {
-      const index = eventosAtualizados[dataSelecionada].findIndex(
-        e => e.titulo === eventoSelecionado.titulo &&
-          e.descricao === eventoSelecionado.descricao
-      );
-
-      if (index !== -1) {
-        eventosAtualizados[dataSelecionada][index] = {
-          ...eventosAtualizados[dataSelecionada][index],
-          titulo: novoTitulo,
-          descricao: novaDescricao,
-        };
+      if (response.success) {
+        await fetchDaySchedule(dataSelecionada);
+        await fetchMonthSchedule(currentMonth);
+        setModalEditarVisivel(false);
+        setEventoSelecionado(null);
+        alert('Evento atualizado com sucesso!');
+      } else {
+        alert(response.message || 'Erro ao atualizar evento');
       }
+    } catch (error) {
+      console.error('Erro ao atualizar evento:', error);
+      alert('Erro ao atualizar evento');
     }
-
-    setEventos(eventosAtualizados);
-    setModalEditarVisivel(false);
-    setEventoSelecionado(null);
   };
 
-  const deletarEvento = () => {
+  const deletarEvento = async () => {
     if (!eventoSelecionado) return;
 
-    const eventosAtualizados = { ...eventos };
+    try {
+      const response = await deleteSchedule(jwt, eventoSelecionado.documentId);
 
-    if (eventosAtualizados[dataSelecionada]) {
-      eventosAtualizados[dataSelecionada] = eventosAtualizados[dataSelecionada].filter(
-        e => !(e.titulo === eventoSelecionado.titulo && e.descricao === eventoSelecionado.descricao)
-      );
-
-      // Remove a data se não houver mais eventos
-      if (eventosAtualizados[dataSelecionada].length === 0) {
-        delete eventosAtualizados[dataSelecionada];
+      if (response.success) {
+        await fetchDaySchedule(dataSelecionada);
+        await fetchMonthSchedule(currentMonth);
+        fecharModal();
+        alert('Evento deletado com sucesso!');
+      } else {
+        alert(response.message || 'Erro ao deletar evento');
       }
+    } catch (error) {
+      console.error('Erro ao deletar evento:', error);
+      alert('Erro ao deletar evento');
     }
-
-    setEventos(eventosAtualizados);
-    fecharModal();
   };
 
   const abrirModalAdicionar = () => {
     setModalAdicionarVisivel(true);
   };
 
-  const salvarNovoEvento = (titulo: string, descricao: string) => {
-    const novoEvento: Evento = {
-      titulo,
-      descricao,
-      data: dataSelecionada.split("-").reverse().join("/").substring(0, 5),
-    };
+  const salvarNovoEvento = async (titulo: string, descricao: string, time: string) => {
+    try {
+      const response = await createSchedule(jwt, {
+        name: titulo,
+        description: descricao,
+        date: dataSelecionada,
+        time: time,
+      });
 
-    const eventosAtualizados = { ...eventos };
-
-    if (eventosAtualizados[dataSelecionada]) {
-      eventosAtualizados[dataSelecionada].push(novoEvento);
-    } else {
-      eventosAtualizados[dataSelecionada] = [novoEvento];
+      if (response.success) {
+        await fetchDaySchedule(dataSelecionada);
+        await fetchMonthSchedule(currentMonth);
+        setModalAdicionarVisivel(false);
+        alert('Evento criado com sucesso!');
+      } else {
+        alert(response.message || 'Erro ao criar evento');
+      }
+    } catch (error) {
+      console.error('Erro ao criar evento:', error);
+      alert('Erro ao criar evento');
     }
+  };
 
-    setEventos(eventosAtualizados);
-    setModalAdicionarVisivel(false);
+  const handleMonthChange = (month: any) => {
+    if (month && month.dateString) {
+      const newMonth = month.dateString.substring(0, 7); // YYYY-MM
+      if (newMonth && newMonth.includes('-') && newMonth.length === 7) {
+        setCurrentMonth(newMonth);
+      }
+    }
   };
 
   const formatarDataExibicao = (dataString: string) => {
@@ -218,6 +323,7 @@ export default function TelaAgenda() {
         <View style={styles.calendarioContainer}>
           <Calendar
             onDayPress={(day: DateData) => setDataSelecionada(day.dateString)}
+            onMonthChange={handleMonthChange}
             markingType={"custom"}
             markedDates={marcarDatas()}
             monthFormat={'MMMM yyyy'}
@@ -273,7 +379,7 @@ export default function TelaAgenda() {
             >
               {eventosDoDia.map((item, index) => (
                 <TouchableOpacity
-                  key={index}
+                  key={item.documentId}
                   style={styles.cartaoEvento}
                   onPress={() => abrirEvento(item)}
                 >
@@ -281,7 +387,7 @@ export default function TelaAgenda() {
                   <View style={styles.conteudoEvento}>
                     <View style={styles.headerEvento}>
                       <Text style={styles.tituloEvento}>{item.titulo}</Text>
-                      <Text style={styles.dataEvento}>{item.data}</Text>
+                      <Text style={styles.dataEvento}>{item.time}</Text>
                     </View>
 
                     <Text style={styles.labelDescricao}>Descrição:</Text>
@@ -323,6 +429,7 @@ export default function TelaAgenda() {
         onSalvar={salvarEdicao}
         tituloInicial={eventoSelecionado?.titulo || ""}
         descricaoInicial={eventoSelecionado?.descricao || ""}
+        timeInicial={eventoSelecionado?.time || ""}
       />
 
       <Modal
@@ -354,7 +461,7 @@ export default function TelaAgenda() {
                       {eventoSelecionado?.titulo}
                     </Text>
                     <Text style={styles.modalCardData}>
-                      {eventoSelecionado?.data}
+                      {eventoSelecionado?.time}
                     </Text>
                   </View>
 
