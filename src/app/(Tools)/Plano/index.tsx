@@ -7,64 +7,28 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
+  Linking,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Cabecalho from '@/src/components/headertools';
 import { getMyData } from '@/src/service/perfilService';
 import { getStoredJWT } from '@/src/service/loginService';
-
-interface Item {
-  id: string;
-  texto: string;
-  checked: boolean;
-}
-
-const trabalhoDeParto: Item[] = [
-  { id: '1', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '2', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '3', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '4', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-];
-
-const parto: Item[] = [
-  { id: '5', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '6', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '7', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '8', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-];
-
-const posParto: Item[] = [
-  { id: '9', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '10', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '11', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '12', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-];
-
-const cuidadosBebe: Item[] = [
-  { id: '13', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '14', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '15', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '16', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-];
-
-const cesaria: Item[] = [
-  { id: '17', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '18', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '19', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-  { id: '20', texto: 'Elementum nibh commodo auctor neque.', checked: false },
-];
+import {
+  listChildbirthPlans,
+  selectOrUnselectChildbirthPlan,
+  generateChildbirthPlanPDF,
+  ChildbirthPlan,
+} from '@/src/service/planoDePartoService';
 
 export default function PlanoDeParto() {
-  const [trabalho, setTrabalho] = useState(trabalhoDeParto);
-  const [partoItems, setPartoItems] = useState(parto);
-  const [posPartoItems, setPosPartoItems] = useState(posParto);
-  const [cuidadosBebeItems, setCuidadosBebeItems] = useState(cuidadosBebe);
-  const [cesariaItems, setCesariaItems] = useState(cesaria);
-  
+  const [childbirthPlans, setChildbirthPlans] = useState<ChildbirthPlan[]>([]);
+
   // Estados para os dados da API
   const [nomeMae, setNomeMae] = useState('');
   const [nomeBebe, setNomeBebe] = useState('');
   const [loading, setLoading] = useState(true);
+  const [generatingPDF, setGeneratingPDF] = useState(false);
 
   useEffect(() => {
     carregarDados();
@@ -73,64 +37,118 @@ export default function PlanoDeParto() {
   const carregarDados = async () => {
     try {
       setLoading(true);
-      
-      // Pegar o token usando a função do loginService
+
       const token = await getStoredJWT();
-      
+
       console.log('Token recuperado:', token ? 'Token existe' : 'Token não encontrado');
-      
+
       if (token) {
-        const response = await getMyData(token);
-        
-        console.log('Response da API:', response);
-        console.log('Dados retornados:', response.data);
-        
-        if (response.success && response.data) {
-          console.log('Nome da mãe:', response.data.name);
-          console.log('Nome do bebê:', response.data.babyName);
-          
-          setNomeMae(response.data.name || '');
-          setNomeBebe(response.data.babyName || '');
+        // Carregar dados do perfil
+        const profileResponse = await getMyData(token);
+
+        if (profileResponse.success && profileResponse.data) {
+          setNomeMae(profileResponse.data.name || '');
+          setNomeBebe(profileResponse.data.babyName || '');
         } else {
-          console.log('Erro na resposta:', response.message);
+          console.log('Erro na resposta do perfil:', profileResponse.message);
+        }
+
+        // Carregar planos de parto da API
+        const plansResponse = await listChildbirthPlans();
+
+        if (plansResponse.success && plansResponse.data) {
+          setChildbirthPlans(plansResponse.data);
+        } else {
+          Alert.alert('Erro', plansResponse.message || 'Erro ao carregar planos de parto');
         }
       } else {
         console.log('Token não encontrado no AsyncStorage');
+        Alert.alert('Erro', 'Usuário não autenticado');
       }
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
+      Alert.alert('Erro', 'Erro ao carregar dados');
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleCheck = (
-    list: Item[],
-    setList: React.Dispatch<React.SetStateAction<Item[]>>,
-    id: string
-  ) => {
-    const atualizada = list.map((item) =>
-      item.id === id ? { ...item, checked: !item.checked } : item
-    );
-    setList(atualizada);
+  const toggleCheck = async (plan: ChildbirthPlan) => {
+    const action = plan.clientSelect ? 'unselect' : 'select';
+
+    try {
+      const response = await selectOrUnselectChildbirthPlan(plan.documentId, action);
+
+      if (response.success) {
+        // Atualizar o estado local
+        setChildbirthPlans(prevPlans =>
+          prevPlans.map(p =>
+            p.documentId === plan.documentId
+              ? { ...p, clientSelect: !p.clientSelect }
+              : p
+          )
+        );
+      } else {
+        Alert.alert('Erro', response.message || 'Erro ao atualizar plano');
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar plano:', error);
+      Alert.alert('Erro', 'Erro ao atualizar plano');
+    }
   };
 
-  const renderItem = (
-    item: Item,
-    list: Item[],
-    setList: React.Dispatch<React.SetStateAction<Item[]>>
-  ) => (
-    <View key={item.id} style={styles.item}>
-      <TouchableOpacity onPress={() => toggleCheck(list, setList, item.id)}>
+  const handleDownloadPDF = async () => {
+    try {
+      setGeneratingPDF(true);
+
+      const response = await generateChildbirthPlanPDF();
+
+      if (response.success && response.data) {
+        const filename = response.data as string;
+
+        Alert.alert(
+          'PDF Gerado',
+          `Seu plano de parto foi gerado com sucesso: ${filename}`,
+          [
+            {
+              text: 'OK',
+              onPress: () => console.log('PDF gerado:', filename),
+            },
+          ]
+        );
+      } else {
+        Alert.alert('Erro', response.message || 'Erro ao gerar PDF');
+      }
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      Alert.alert('Erro', 'Erro ao gerar PDF');
+    } finally {
+      setGeneratingPDF(false);
+    }
+  };
+
+  const renderPlanItem = (plan: ChildbirthPlan) => (
+    <View key={plan.documentId} style={styles.item}>
+      <TouchableOpacity onPress={() => toggleCheck(plan)}>
         <Ionicons
-          name={item.checked ? 'checkbox' : 'square-outline'}
+          name={plan.clientSelect ? 'checkbox' : 'square-outline'}
           size={24}
           color="#42cfe0"
         />
       </TouchableOpacity>
-      <Text style={styles.itemTexto}>{item.texto}</Text>
+      <Text style={styles.itemTexto}>{plan.name}</Text>
     </View>
   );
+
+  const groupPlansByType = (plans: ChildbirthPlan[]) => {
+    return plans.reduce((acc, plan) => {
+      if (!acc[plan.type]) {
+        acc[plan.type] = [];
+      }
+      acc[plan.type].push(plan);
+      return acc;
+    }, {} as Record<string, ChildbirthPlan[]>);
+  };
 
   if (loading) {
     return (
@@ -143,6 +161,8 @@ export default function PlanoDeParto() {
       </SafeAreaView>
     );
   }
+
+  const groupedPlans = groupPlansByType(childbirthPlans);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -158,33 +178,23 @@ export default function PlanoDeParto() {
           </Text>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.tituloSecao}>TRABALHO DE PARTO</Text>
-          {trabalho.map((item) => renderItem(item, trabalho, setTrabalho))}
-        </View>
+        {Object.entries(groupedPlans).map(([type, plans]) => (
+          <View key={type} style={styles.section}>
+            <Text style={styles.tituloSecao}>{type.toUpperCase()}</Text>
+            {plans.map(plan => renderPlanItem(plan))}
+          </View>
+        ))}
 
-        <View style={styles.section}>
-          <Text style={styles.tituloSecao}>PARTO</Text>
-          {partoItems.map((item) => renderItem(item, partoItems, setPartoItems))}
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.tituloSecao}>PÓS PARTO</Text>
-          {posPartoItems.map((item) => renderItem(item, posPartoItems, setPosPartoItems))}
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.tituloSecao}>CUIDADOS COM O BEBÊ</Text>
-          {cuidadosBebeItems.map((item) => renderItem(item, cuidadosBebeItems, setCuidadosBebeItems))}
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.tituloSecao}>CESÁRIA</Text>
-          {cesariaItems.map((item) => renderItem(item, cesariaItems, setCesariaItems))}
-        </View>
-
-         <TouchableOpacity style={styles.botao}>
-          <Text style={styles.textoBotao}>BAIXAR</Text>
+        <TouchableOpacity
+          style={[styles.botao, generatingPDF && styles.botaoDisabled]}
+          onPress={handleDownloadPDF}
+          disabled={generatingPDF}
+        >
+          {generatingPDF ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.textoBotao}>BAIXAR</Text>
+          )}
         </TouchableOpacity>
 
         <Text style={styles.textoAdicionar}>
@@ -245,11 +255,14 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   botao: {
-    backgroundColor: '#4AC6DC', 
+    backgroundColor: '#4AC6DC',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 20,
+  },
+  botaoDisabled: {
+    opacity: 0.6,
   },
   textoBotao: {
     color: '#fff',
