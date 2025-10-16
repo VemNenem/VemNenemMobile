@@ -143,18 +143,29 @@ export const generateChildbirthPlanPDF = async (): Promise<PDFResponse> => {
         });
 
         if (!response.ok) {
-            const result = await response.json();
-            return {
-                success: false,
-                message: result.message || result.error?.message || 'Erro ao gerar PDF',
-            };
+            try {
+                const result = await response.json();
+                return {
+                    success: false,
+                    message: result.message || result.error?.message || 'Erro ao gerar PDF',
+                };
+            } catch {
+                return {
+                    success: false,
+                    message: 'Erro ao gerar PDF',
+                };
+            }
         }
 
-        const result = await response.json();
+        // Ler a resposta como texto (nome do arquivo)
+        const filename = await response.text();
+
+        // Construir a URL completa do PDF
+        const pdfUrl = `https://api.vemnenem.app.br/${filename}`;
 
         return {
             success: true,
-            data: result.filename || result.data || result, // Handle different possible response formats
+            data: pdfUrl,
         };
     } catch (error) {
         console.error('Erro ao gerar PDF:', error);

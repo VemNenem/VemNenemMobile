@@ -104,15 +104,26 @@ export default function PlanoDeParto() {
       const response = await generateChildbirthPlanPDF();
 
       if (response.success && response.data) {
-        const filename = response.data as string;
+        const pdfUrl = response.data as string;
 
         Alert.alert(
           'PDF Gerado',
-          `Seu plano de parto foi gerado com sucesso: ${filename}`,
+          'Seu plano de parto foi gerado com sucesso!',
           [
             {
-              text: 'OK',
-              onPress: () => console.log('PDF gerado:', filename),
+              text: 'Cancelar',
+              style: 'cancel',
+            },
+            {
+              text: 'Abrir PDF',
+              onPress: async () => {
+                const supported = await Linking.canOpenURL(pdfUrl);
+                if (supported) {
+                  await Linking.openURL(pdfUrl);
+                } else {
+                  Alert.alert('Erro', 'Não foi possível abrir o PDF');
+                }
+              },
             },
           ]
         );
