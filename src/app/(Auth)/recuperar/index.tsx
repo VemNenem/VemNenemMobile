@@ -7,11 +7,49 @@ import {
   StyleSheet,
   Image,
   ImageBackground,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { forgotPassword } from '@/src/service/esqueciSenhaService';
 
 export default function RecuperarSenha() {
   const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleEnviar = async () => {
+    if (!email.trim()) {
+      Alert.alert("Atenção", "Por favor, insira seu email");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await forgotPassword({ email: email.trim() });
+
+      if (response.success) {
+        Alert.alert(
+          "Sucesso",
+          response.message || "Email de recuperação enviado com sucesso!",
+          [
+            {
+              text: "OK",
+              onPress: () => router.back(),
+            },
+          ]
+        );
+        setEmail("");
+      } else {
+        Alert.alert("Erro", response.message || "Erro ao enviar email de recuperação");
+      }
+    } catch (error) {
+      console.error("Erro ao enviar email:", error);
+      Alert.alert("Erro", "Erro ao enviar email de recuperação. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ImageBackground
@@ -35,18 +73,29 @@ export default function RecuperarSenha() {
             keyboardType="email-address"
             style={styles.input}
             placeholderTextColor="#707070"
+            value={email}
+            onChangeText={setEmail}
+            editable={!loading}
+            autoCapitalize="none"
+            autoCorrect={false}
           />
 
-          <TouchableOpacity 
-            style={styles.continueButton}
-            onPress={() => router.push("/")}
+          <TouchableOpacity
+            style={[styles.continueButton, loading && styles.buttonDisabled]}
+            onPress={handleEnviar}
+            disabled={loading}
           >
-            <Text style={styles.continueButtonText}>ENVIAR</Text>
+            {loading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={styles.continueButtonText}>ENVIAR</Text>
+            )}
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}
+            disabled={loading}
           >
             <Text style={styles.backButtonText}>VOLTAR</Text>
           </TouchableOpacity>
@@ -122,6 +171,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: "center",
     marginBottom: 16,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   continueButtonText: {
     color: "#fff",
