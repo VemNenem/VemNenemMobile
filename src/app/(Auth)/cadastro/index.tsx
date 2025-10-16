@@ -133,6 +133,14 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
         Alert.alert("Erro", "Preencha todos os campos obrigatórios");
         return;
       }
+
+      // Validação da senha
+      const senhaValida = validarSenha(formData.senha);
+      if (!senhaValida.valida) {
+        Alert.alert("Senha inválida", senhaValida.mensagem);
+        return;
+      }
+
       setStep(2);
     } else {
       // Validação básica do step 2
@@ -164,12 +172,16 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
         });
 
         if (result.success) {
-          Alert.alert("Sucesso", "Cadastro realizado com sucesso!", [
-            {
-              text: "OK",
-              onPress: () => router.push("/(main)/inicio"),
-            },
-          ]);
+          Alert.alert(
+            "Sucesso",
+            "Cadastro realizado com sucesso! Faça login para acessar o aplicativo.",
+            [
+              {
+                text: "OK",
+                onPress: () => router.push("/"),
+              },
+            ]
+          );
         } else {
           Alert.alert("Erro", result.message || "Erro ao realizar cadastro");
         }
@@ -179,6 +191,48 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
         setLoading(false);
       }
     }
+  };
+
+  const validarSenha = (senha: string): { valida: boolean; mensagem: string } => {
+    if (senha.length < 8) {
+      return {
+        valida: false,
+        mensagem: "A senha deve ter pelo menos 8 caracteres",
+      };
+    }
+
+    if (!/[a-z]/.test(senha)) {
+      return {
+        valida: false,
+        mensagem: "A senha deve conter pelo menos uma letra minúscula",
+      };
+    }
+
+    if (!/[A-Z]/.test(senha)) {
+      return {
+        valida: false,
+        mensagem: "A senha deve conter pelo menos uma letra maiúscula",
+      };
+    }
+
+    if (!/[0-9]/.test(senha)) {
+      return {
+        valida: false,
+        mensagem: "A senha deve conter pelo menos um número",
+      };
+    }
+
+    if (!/[@#$%&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(senha)) {
+      return {
+        valida: false,
+        mensagem: "A senha deve conter pelo menos um caractere especial (@#$%&*...)",
+      };
+    }
+
+    return {
+      valida: true,
+      mensagem: "",
+    };
   };
 
   return (

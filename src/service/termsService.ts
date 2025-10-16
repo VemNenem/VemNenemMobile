@@ -21,13 +21,23 @@ export const getTerms = async (
             },
         });
 
-        const result = await response.json();
-
         if (!response.ok) {
             return {
                 success: false,
-                message: result.message || 'Erro ao buscar termos',
+                message: 'Erro ao buscar termos',
             };
+        }
+
+        // Verificar o tipo de conteúdo da resposta
+        const contentType = response.headers.get('content-type');
+        let result;
+
+        if (contentType && contentType.includes('application/json')) {
+            result = await response.json();
+        } else {
+            // Se não for JSON, ler como texto
+            const text = await response.text();
+            result = { content: text };
         }
 
         return {
