@@ -246,18 +246,20 @@ export const deleteMyClient = async (jwt: string): Promise<DeleteAccountResponse
             },
         });
 
-        const result = await response.json();
+        // A API retorna uma string pura, não JSON
+        const text = await response.text();
 
         if (!response.ok) {
             return {
                 success: false,
-                message: result.message || result.error?.message || 'Erro ao deletar conta',
+                message: text || 'Erro ao deletar conta',
             };
         }
 
+        // Retorna a mensagem da API (ex: "Usuário excluido com sucesso")
         return {
             success: true,
-            message: 'Conta deletada com sucesso!',
+            message: text || 'Conta deletada com sucesso!',
         };
     } catch (error) {
         console.error('Erro ao deletar conta:', error);

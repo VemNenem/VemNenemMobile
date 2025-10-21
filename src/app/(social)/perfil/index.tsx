@@ -122,11 +122,12 @@ const Perfil = () => {
       }
       const resultado = await deleteMyClient(jwt);
       if (resultado.success) {
+        // Faz logout e redireciona para tela de login
+        await logout();
         Alert.alert('Sucesso', resultado.message || 'Conta deletada com sucesso!', [
           {
             text: 'OK',
-            onPress: async () => {
-              await logout();
+            onPress: () => {
               router.replace('/');
             },
           },
