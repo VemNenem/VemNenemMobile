@@ -10,23 +10,21 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-  Modal,
   Platform,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { createClient } from "../../../service/cadastroService";
-import { getTerms } from "../../../service/termsService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const TEMP_FORM_KEY = '@cadastro_temp_form';
 
 export default function Cadastro() {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [showTermsModal, setShowTermsModal] = useState(false);
-  const [tipoSelecionado, setTipoSelecionado] = useState<'privacy' | 'terms'>('privacy');
-  const [conteudo, setConteudo] = useState<string>("");
-  const [carregandoTermos, setCarregandoTermos] = useState(false);
   const [formData, setFormData] = useState({
     nome: "",
     email: "",
@@ -40,69 +38,53 @@ export default function Cadastro() {
   const [dppDate, setDppDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // Carrega os termos quando o modal é aberto ou quando muda o tipo
+  // Carrega dados salvos temporariamente ao montar o componente
   useEffect(() => {
-    if (showTermsModal) {
-      carregarTermos();
+    loadTempFormData();
+  }, []);
+
+  // Restaura o step quando voltar dos termos
+  useEffect(() => {
+    if (params.step) {
+      setStep(Number(params.step));
     }
-  }, [showTermsModal, tipoSelecionado]);
+  }, [params.step]);
 
-  const carregarTermos = async () => {
-    setCarregandoTermos(true);
+  // Salva dados temporariamente sempre que formData mudar
+  useEffect(() => {
+    saveTempFormData();
+  }, [formData]);
+
+  const loadTempFormData = async () => {
     try {
-      const resultado = await getTerms(tipoSelecionado);
-
-      if (resultado.success && resultado.data) {
-        // Adapte conforme a estrutura real da resposta da API
-        const texto = resultado.data.content || resultado.data.text || resultado.data.description || JSON.stringify(resultado.data, null, 2);
-        setConteudo(texto);
-      } else {
-        // Conteúdo padrão caso a API falhe
-        setConteudo(getConteudoPadrao());
+      const savedData = await AsyncStorage.getItem(TEMP_FORM_KEY);
+      if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        setFormData(parsedData);
+        // Se tem DPP, atualiza o date picker também
+        if (parsedData.dpp) {
+          const [day, month, year] = parsedData.dpp.split("/");
+          setDppDate(new Date(Number(year), Number(month) - 1, Number(day)));
+        }
       }
     } catch (error) {
-      console.error("Erro ao carregar termos:", error);
-      setConteudo(getConteudoPadrao());
-    } finally {
-      setCarregandoTermos(false);
+      console.error("Erro ao carregar dados temporários:", error);
     }
   };
 
-  const getConteudoPadrao = () => {
-    if (tipoSelecionado === 'privacy') {
-      return `Política de Privacidade
+  const saveTempFormData = async () => {
+    try {
+      await AsyncStorage.setItem(TEMP_FORM_KEY, JSON.stringify(formData));
+    } catch (error) {
+      console.error("Erro ao salvar dados temporários:", error);
+    }
+  };
 
-1. Coleta de Dados
-Podemos coletar informações pessoais, como nome, e-mail, endereço IP e dados de navegação.
-
-2. Uso dos Dados
-Os dados coletados podem ser usados para melhorar nossos serviços, personalizar sua experiência e enviar comunicações (se autorizado).
-
-3. Compartilhamento de Dados
-Não vendemos seus dados, mas podemos compartilhá-los com parceiros de confiança e autoridades legais (se exigido por lei).
-
-4. Segurança
-Empregamos medidas de segurança para proteger seus dados, mas nenhum sistema é 100% invulnerável.
-
-5. Seus Direitos
-Você tem o direito de acessar, corrigir ou excluir seus dados pessoais a qualquer momento.`;
-    } else {
-      return `Termos de Uso
-
-1. Aceitação dos Termos
-Ao acessar ou utilizar nosso serviço, você concorda com estes Termos de Uso. Se não concordar, não utilize nossos serviços.
-
-2. Uso do Serviço
-Você concorda em usar o serviço apenas para fins legais e de acordo com estes termos.
-
-3. Propriedade Intelectual
-Todo o conteúdo do serviço é protegido por direitos autorais e outras leis de propriedade intelectual.
-
-4. Alterações nos Termos
-Reservamos o direito de modificar estes termos a qualquer momento. Alterações serão comunicadas por e-mail ou notificação no aplicativo.
-
-5. Rescisão
-Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação destes termos.`;
+  const clearTempFormData = async () => {
+    try {
+      await AsyncStorage.removeItem(TEMP_FORM_KEY);
+    } catch (error) {
+      console.error("Erro ao limpar dados temporários:", error);
     }
   };
 
@@ -172,6 +154,8 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
         });
 
         if (result.success) {
+          // Limpa os dados temporários após cadastro bem-sucedido
+          await clearTempFormData();
           Alert.alert(
             "Sucesso",
             "Cadastro realizado com sucesso! Faça login para acessar o aplicativo.",
@@ -381,10 +365,10 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
                 <View style={styles.termsTextContainer}>
                   <Text style={styles.termsText}>Li e aceito os </Text>
                   <TouchableOpacity
-                    onPress={() => {
-                      setTipoSelecionado('privacy');
-                      setShowTermsModal(true);
-                    }}
+                    onPress={() => router.push({
+                      pathname: '/(Auth)/termos',
+                      params: { returnStep: '2' }
+                    })}
                   >
                     <Text style={styles.termsLink}>
                       Termos de Uso e Política de Privacidade
@@ -412,7 +396,15 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
 
             <TouchableOpacity
               style={styles.backButton}
-              onPress={() => (step === 1 ? router.back() : setStep(1))}
+              onPress={async () => {
+                if (step === 1) {
+                  // Limpa dados temporários ao sair do cadastro
+                  await clearTempFormData();
+                  router.back();
+                } else {
+                  setStep(1);
+                }
+              }}
               disabled={loading}
             >
               <Text style={styles.backButtonText}>VOLTAR</Text>
@@ -420,74 +412,6 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
           </View>
         </View>
       </View>
-
-      <Modal
-        visible={showTermsModal}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setShowTermsModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Termos de Uso e Política de Privacidade</Text>
-            </View>
-
-            <View style={styles.switchContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.switchButton,
-                  tipoSelecionado === 'privacy' && styles.activeSwitch,
-                ]}
-                onPress={() => setTipoSelecionado('privacy')}
-              >
-                <Text
-                  style={[
-                    styles.switchText,
-                    tipoSelecionado === 'privacy' && styles.activeSwitchText,
-                  ]}
-                >
-                  Privacidade
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.switchButton,
-                  tipoSelecionado === 'terms' && styles.activeSwitch,
-                ]}
-                onPress={() => setTipoSelecionado('terms')}
-              >
-                <Text
-                  style={[
-                    styles.switchText,
-                    tipoSelecionado === 'terms' && styles.activeSwitchText,
-                  ]}
-                >
-                  Termos de Uso
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {carregandoTermos ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#42CFE0" />
-                <Text style={styles.loadingText}>Carregando...</Text>
-              </View>
-            ) : (
-              <ScrollView style={styles.modalContent}>
-                <Text style={styles.termsTextModal}>{conteudo}</Text>
-              </ScrollView>
-            )}
-
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => setShowTermsModal(false)}
-            >
-              <Text style={styles.modalButtonText}>FECHAR</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </ImageBackground>
   );
 }
@@ -673,100 +597,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   continueButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  // Estilos do Modal
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    width: "90%",
-    maxHeight: "80%",
-    padding: 20,
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  modalTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#707070",
-    flex: 1,
-  },
-  closeButton: {
-    padding: 5,
-  },
-  closeButtonText: {
-    fontSize: 24,
-    color: "#707070",
-    fontWeight: "bold",
-  },
-  switchContainer: {
-    flexDirection: "row",
-    marginBottom: 15,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 30,
-    padding: 4,
-  },
-  switchButton: {
-    flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 26,
-    alignItems: "center",
-  },
-  switchText: {
-    color: "#707070",
-    fontSize: 13,
-  },
-  activeSwitch: {
-    backgroundColor: "#42CFE0",
-  },
-  activeSwitchText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  loadingContainer: {
-    width: "100%",
-    height: 300,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  loadingText: {
-    marginTop: 10,
-    color: "#707070",
-    fontSize: 14,
-  },
-  modalContent: {
-    flex: 1,
-    marginBottom: 15,
-  },
-  termsTextModal: {
-    fontSize: 14,
-    color: "#707070",
-    lineHeight: 22,
-    textAlign: "justify",
-  },
-  modalButton: {
-    backgroundColor: "#42CFE0",
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  modalButtonText: {
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,

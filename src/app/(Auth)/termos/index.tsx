@@ -10,11 +10,12 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { getTerms } from "../../../service/termsService";
 
 export default function TermosPrivacidade() {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const [tipoSelecionado, setTipoSelecionado] = useState<'privacy' | 'terms'>('privacy');
   const [conteudo, setConteudo] = useState<string>("");
   const [carregando, setCarregando] = useState(true);
@@ -143,7 +144,20 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
             </ScrollView>
           )}
 
-          <TouchableOpacity onPress={() => router.back()} style={styles.acceptButton}>
+          <TouchableOpacity
+            onPress={() => {
+              // Se veio do cadastro step 2, volta com o parâmetro
+              if (params.returnStep) {
+                router.push({
+                  pathname: '/(Auth)/cadastro',
+                  params: { step: params.returnStep }
+                });
+              } else {
+                router.back();
+              }
+            }}
+            style={styles.acceptButton}
+          >
             <Text style={styles.acceptButtonText}>VOLTAR</Text>
           </TouchableOpacity>
         </View>
