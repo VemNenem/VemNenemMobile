@@ -35,7 +35,7 @@ export default function RecuperarSenha() {
           [
             {
               text: "OK",
-              onPress: () => router.back(),
+              onPress: () => router.push("/redefinir" as any),
             },
           ]
         );
