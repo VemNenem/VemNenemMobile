@@ -57,7 +57,10 @@ export default function Inicio() {
   };
 
   const formatarData = (dataString: string): string => {
-    const data = new Date(dataString);
+    // Dividir a data string para evitar problemas de timezone
+    const [ano, mes, dia] = dataString.split('-').map(Number);
+    const data = new Date(ano, mes - 1, dia); // mes - 1 porque Date usa 0-11 para meses
+
     const hoje = new Date();
     const amanha = new Date(hoje);
     amanha.setDate(amanha.getDate() + 1);
