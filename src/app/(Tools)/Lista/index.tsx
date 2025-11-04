@@ -17,7 +17,6 @@ import Cabecalho from '@/src/components/headertools';
 import { listList, createList, updateList, deleteList, Lista } from '@/src/service/listaService';
 import { getStoredJWT } from '@/src/service/loginService';
 
-// Popup para criar/editar lista
 interface ListPopupProps {
   visible: boolean;
   onClose: () => void;
@@ -259,7 +258,6 @@ export default function ListasScreen() {
       });
 
       if (response.success && response.data) {
-        // Atualizar a lista localmente
         setListas(
           listas.map((lista) =>
             lista.documentId === selectedLista.documentId ? response.data! : lista
@@ -294,7 +292,6 @@ export default function ListasScreen() {
               const response = await deleteList(jwt, lista.documentId);
 
               if (response.success) {
-                // Remover da lista localmente
                 setListas(listas.filter((l) => l.documentId !== lista.documentId));
                 Alert.alert('Sucesso', 'Lista excluída com sucesso!');
               } else {
@@ -337,7 +334,7 @@ export default function ListasScreen() {
           onPress={() => handleEditLista(item)}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons name="pencil-outline" size={20} color="#007AFF" />
+          <Ionicons name="pencil-outline" size={20} color="#5dd4e3" />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -367,7 +364,7 @@ export default function ListasScreen() {
         <View style={styles.container}>
           <Cabecalho title="Listas" />
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#007AFF" />
+            <ActivityIndicator size="large" color="#5dd4e3" />
             <Text style={styles.loadingText}>Carregando listas...</Text>
           </View>
         </View>

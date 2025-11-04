@@ -23,8 +23,6 @@ import {
 
 export default function PlanoDeParto() {
   const [childbirthPlans, setChildbirthPlans] = useState<ChildbirthPlan[]>([]);
-
-  // Estados para os dados da API
   const [nomeMae, setNomeMae] = useState('');
   const [nomeBebe, setNomeBebe] = useState('');
   const [loading, setLoading] = useState(true);
@@ -43,7 +41,6 @@ export default function PlanoDeParto() {
       console.log('Token recuperado:', token ? 'Token existe' : 'Token não encontrado');
 
       if (token) {
-        // Carregar dados do perfil
         const profileResponse = await getMyData(token);
 
         if (profileResponse.success && profileResponse.data) {
@@ -53,7 +50,6 @@ export default function PlanoDeParto() {
           console.log('Erro na resposta do perfil:', profileResponse.message);
         }
 
-        // Carregar planos de parto da API
         const plansResponse = await listChildbirthPlans();
 
         if (plansResponse.success && plansResponse.data) {
@@ -80,7 +76,6 @@ export default function PlanoDeParto() {
       const response = await selectOrUnselectChildbirthPlan(plan.documentId, action);
 
       if (response.success) {
-        // Atualizar o estado local
         setChildbirthPlans(prevPlans =>
           prevPlans.map(p =>
             p.documentId === plan.documentId

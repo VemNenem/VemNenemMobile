@@ -41,7 +41,6 @@ export interface RefreshTokenResponse {
     refreshToken?: string;
 }
 
-// Chaves para AsyncStorage
 const STORAGE_KEYS = {
     JWT: '@VemNenem:jwt',
     REFRESH_TOKEN: '@VemNenem:refreshToken',
@@ -49,9 +48,6 @@ const STORAGE_KEYS = {
     REMEMBER_ME: '@VemNenem:rememberMe',
 };
 
-/**
- * Função para realizar o login
- */
 export const login = async (
     identifier: string,
     password: string,
@@ -82,7 +78,6 @@ export const login = async (
             };
         }
 
-        // Salvar dados no AsyncStorage
         if (result.jwt) {
             await AsyncStorage.setItem(STORAGE_KEYS.JWT, result.jwt);
         }
@@ -136,7 +131,6 @@ export const refreshToken = async (
             };
         }
 
-        // Atualizar tokens no AsyncStorage
         if (result.jwt) {
             await AsyncStorage.setItem(STORAGE_KEYS.JWT, result.jwt);
         }
@@ -159,9 +153,6 @@ export const refreshToken = async (
     }
 };
 
-/**
- * Função para obter o token JWT armazenado
- */
 export const getStoredJWT = async (): Promise<string | null> => {
     try {
         return await AsyncStorage.getItem(STORAGE_KEYS.JWT);
@@ -171,9 +162,6 @@ export const getStoredJWT = async (): Promise<string | null> => {
     }
 };
 
-/**
- * Função para obter o refreshToken armazenado
- */
 export const getStoredRefreshToken = async (): Promise<string | null> => {
     try {
         return await AsyncStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
@@ -183,9 +171,6 @@ export const getStoredRefreshToken = async (): Promise<string | null> => {
     }
 };
 
-/**
- * Função para obter o usuário armazenado
- */
 export const getStoredUser = async (): Promise<User | null> => {
     try {
         const userString = await AsyncStorage.getItem(STORAGE_KEYS.USER);
@@ -196,9 +181,6 @@ export const getStoredUser = async (): Promise<User | null> => {
     }
 };
 
-/**
- * Função para verificar se o usuário optou por "lembrar de mim"
- */
 export const getRememberMe = async (): Promise<boolean> => {
     try {
         const rememberMe = await AsyncStorage.getItem(STORAGE_KEYS.REMEMBER_ME);
@@ -209,9 +191,6 @@ export const getRememberMe = async (): Promise<boolean> => {
     }
 };
 
-/**
- * Função para fazer logout (limpar dados armazenados)
- */
 export const logout = async (): Promise<void> => {
     try {
         await AsyncStorage.multiRemove([
@@ -225,20 +204,14 @@ export const logout = async (): Promise<void> => {
     }
 };
 
-/**
- * Função para verificar se o usuário está autenticado
- * e tentar renovar o token se necessário
- */
 export const checkAuth = async (): Promise<boolean> => {
     try {
         const jwt = await getStoredJWT();
 
         if (jwt) {
-            // Verificar se o token ainda é válido (você pode adicionar lógica para verificar expiração)
             return true;
         }
 
-        // Tentar renovar o token se tiver refreshToken
         const storedRefreshToken = await getStoredRefreshToken();
         const rememberMe = await getRememberMe();
 

@@ -9,10 +9,6 @@ export interface ForgotPasswordResponse {
     message?: string;
 }
 
-/**
- * Envia email de recuperação de senha
- * Não requer autenticação
- */
 export const forgotPassword = async (
     data: ForgotPasswordData
 ): Promise<ForgotPasswordResponse> => {
@@ -24,7 +20,6 @@ export const forgotPassword = async (
             };
         }
 
-        // Validação básica de email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(data.email)) {
             return {
@@ -41,14 +36,12 @@ export const forgotPassword = async (
             body: JSON.stringify({ email: data.email.trim() }),
         });
 
-        // Verificar o tipo de conteúdo da resposta
         const contentType = response.headers.get('content-type');
         let result;
 
         if (contentType && contentType.includes('application/json')) {
             result = await response.json();
         } else {
-            // Se não for JSON, ler como texto
             const text = await response.text();
             result = { message: text };
         }
@@ -84,10 +77,6 @@ export interface ResetPasswordResponse {
     message?: string;
 }
 
-/**
- * Redefine a senha usando o token recebido por email
- * Não requer autenticação
- */
 export const resetPassword = async (
     data: ResetPasswordData
 ): Promise<ResetPasswordResponse> => {
@@ -106,7 +95,6 @@ export const resetPassword = async (
             };
         }
 
-        // Validação de senha forte
         const hasLowercase = /[a-z]/.test(data.password);
         const hasUppercase = /[A-Z]/.test(data.password);
         const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(data.password);
@@ -137,14 +125,12 @@ export const resetPassword = async (
             }),
         });
 
-        // Verificar o tipo de conteúdo da resposta
         const contentType = response.headers.get('content-type');
         let result;
 
         if (contentType && contentType.includes('application/json')) {
             result = await response.json();
         } else {
-            // Se não for JSON, ler como texto
             const text = await response.text();
             result = { message: text };
         }

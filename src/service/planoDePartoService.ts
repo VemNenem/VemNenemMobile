@@ -23,12 +23,9 @@ export interface SelectPlanResponse {
 export interface PDFResponse {
     success: boolean;
     message?: string;
-    data?: string; // Changed from Blob | string to just string since it returns filename
+    data?: string; 
 }
 
-/**
- * Função para listar planos de parto
- */
 export const listChildbirthPlans = async (): Promise<ListChildbirthPlanResponse> => {
     try {
         const jwt = await getStoredJWT();
@@ -70,9 +67,6 @@ export const listChildbirthPlans = async (): Promise<ListChildbirthPlanResponse>
     }
 };
 
-/**
- * Função para selecionar ou desselecionar um plano de parto
- */
 export const selectOrUnselectChildbirthPlan = async (
     planDocumentId: string,
     action: 'select' | 'unselect'
@@ -121,9 +115,6 @@ export const selectOrUnselectChildbirthPlan = async (
     }
 };
 
-/**
- * Função para gerar PDF do plano de parto
- */
 export const generateChildbirthPlanPDF = async (): Promise<PDFResponse> => {
     try {
         const jwt = await getStoredJWT();
@@ -157,10 +148,8 @@ export const generateChildbirthPlanPDF = async (): Promise<PDFResponse> => {
             }
         }
 
-        // Ler a resposta como texto (nome do arquivo)
         const filename = await response.text();
 
-        // Construir a URL completa do PDF
         const pdfUrl = `https://api.vemnenem.app.br/${filename}`;
 
         return {

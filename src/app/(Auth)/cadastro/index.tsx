@@ -38,19 +38,16 @@ export default function Cadastro() {
   const [dppDate, setDppDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // Carrega dados salvos temporariamente ao montar o componente
   useEffect(() => {
     loadTempFormData();
   }, []);
 
-  // Restaura o step quando voltar dos termos
   useEffect(() => {
     if (params.step) {
       setStep(Number(params.step));
     }
   }, [params.step]);
 
-  // Salva dados temporariamente sempre que formData mudar
   useEffect(() => {
     saveTempFormData();
   }, [formData]);
@@ -61,7 +58,6 @@ export default function Cadastro() {
       if (savedData) {
         const parsedData = JSON.parse(savedData);
         setFormData(parsedData);
-        // Se tem DPP, atualiza o date picker também
         if (parsedData.dpp) {
           const [day, month, year] = parsedData.dpp.split("/");
           setDppDate(new Date(Number(year), Number(month) - 1, Number(day)));
@@ -92,7 +88,6 @@ export default function Cadastro() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Converte data de DD/MM/YYYY para YYYY-MM-DD
   const convertDateToISO = (dateString: string): string => {
     if (!dateString) return "";
     const [day, month, year] = dateString.split("/");
@@ -110,13 +105,11 @@ export default function Cadastro() {
 
   const handleSubmit = async () => {
     if (step === 1) {
-      // Validação básica do step 1
       if (!formData.nome || !formData.email || !formData.senha) {
         Alert.alert("Erro", "Preencha todos os campos obrigatórios");
         return;
       }
 
-      // Validação da senha
       const senhaValida = validarSenha(formData.senha);
       if (!senhaValida.valida) {
         Alert.alert("Senha inválida", senhaValida.mensagem);
@@ -125,13 +118,11 @@ export default function Cadastro() {
 
       setStep(2);
     } else {
-      // Validação básica do step 2
       if (!formData.dpp || !formData.sexoBebe) {
         Alert.alert("Erro", "Preencha todos os campos obrigatórios");
         return;
       }
 
-      // Validação de aceite dos termos
       if (!acceptedTerms) {
         Alert.alert(
           "Atenção",
@@ -154,7 +145,6 @@ export default function Cadastro() {
         });
 
         if (result.success) {
-          // Limpa os dados temporários após cadastro bem-sucedido
           await clearTempFormData();
           Alert.alert(
             "Sucesso",
@@ -347,7 +337,6 @@ export default function Cadastro() {
                 />
               </View>
 
-              {/* Checkbox de aceite dos termos */}
               <View style={styles.termsContainer}>
                 <TouchableOpacity
                   style={styles.checkbox}
@@ -398,7 +387,6 @@ export default function Cadastro() {
               style={styles.backButton}
               onPress={async () => {
                 if (step === 1) {
-                  // Limpa dados temporários ao sair do cadastro
                   await clearTempFormData();
                   router.back();
                 } else {
@@ -475,7 +463,6 @@ const styles = StyleSheet.create({
     color: "#000",
     backgroundColor: "#fff",
   },
-  // Estilos específicos para o campo de data
   dateInput: {
     width: "100%",
     height: 48,

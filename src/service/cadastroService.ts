@@ -2,7 +2,7 @@ const API_URL = 'https://api.vemnenem.app.br/api';
 
 export interface CreateClientData {
     name: string;
-    probableDateOfDelivery: string; // formato: YYYY-MM-DD
+    probableDateOfDelivery: string;
     babyGender: string;
     fatherName?: string;
     babyName?: string;

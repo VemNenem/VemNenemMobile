@@ -44,7 +44,7 @@ export interface MyDataResponse {
 
 export interface UpdateClientData {
     name: string;
-    probableDateOfDelivery: string; // formato: YYYY-MM-DD
+    probableDateOfDelivery: string; 
     babyGender: string;
     fatherName?: string;
     babyName?: string;
@@ -72,10 +72,6 @@ export interface DeleteAccountResponse {
     message?: string;
 }
 
-/**
- * Busca os dados do cliente/perfil logado
- * Requer autenticação - passa o JWT do usuário logado
- */
 export const getMyData = async (jwt: string): Promise<MyDataResponse> => {
     try {
         if (!jwt) {
@@ -115,10 +111,6 @@ export const getMyData = async (jwt: string): Promise<MyDataResponse> => {
     }
 };
 
-/**
- * Atualiza os dados do cliente/perfil
- * Requer autenticação - passa o JWT do usuário logado
- */
 export const updateClient = async (
     jwt: string,
     data: UpdateClientData
@@ -163,10 +155,6 @@ export const updateClient = async (
     }
 };
 
-/**
- * Altera a senha do usuário
- * Requer autenticação - passa o JWT do usuário logado
- */
 export const changePassword = async (
     jwt: string,
     data: ChangePasswordData
@@ -179,7 +167,6 @@ export const changePassword = async (
             };
         }
 
-        // Validação básica
         if (data.password !== data.passwordConfirmation) {
             return {
                 success: false,
@@ -225,10 +212,6 @@ export const changePassword = async (
     }
 };
 
-/**
- * Deleta a conta do cliente/usuário
- * Requer autenticação - passa o JWT do usuário logado
- */
 export const deleteMyClient = async (jwt: string): Promise<DeleteAccountResponse> => {
     try {
         if (!jwt) {
@@ -246,7 +229,6 @@ export const deleteMyClient = async (jwt: string): Promise<DeleteAccountResponse
             },
         });
 
-        // A API retorna uma string pura, não JSON
         const text = await response.text();
 
         if (!response.ok) {
@@ -256,7 +238,6 @@ export const deleteMyClient = async (jwt: string): Promise<DeleteAccountResponse
             };
         }
 
-        // Retorna a mensagem da API (ex: "Usuário excluido com sucesso")
         return {
             success: true,
             message: text || 'Conta deletada com sucesso!',

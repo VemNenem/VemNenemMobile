@@ -45,12 +45,10 @@ export default function CabecalhoLogout({
           </TouchableOpacity>
         </View>
 
-        {/* Título */}
         <View style={styles.titleContainer}>
           <Text style={[styles.title, { color: textColor }]}>{title}</Text>
         </View>
 
-        {/* Ícone logout direita */}
         <View style={styles.iconContainer}>
           <TouchableOpacity onPress={handleLogout} accessibilityLabel="Logout">
             <Ionicons name="log-out-outline" size={24} color={textColor} />

@@ -26,7 +26,6 @@ import {
 
 const windowHeight = Dimensions.get("window").height;
 
-// Configuração do locale para Português Brasileiro
 LocaleConfig.locales['ptBR'] = {
   monthNames: [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -59,16 +58,15 @@ const getHoje = (): string => {
     const dia = String(agora.getDate()).padStart(2, '0');
     const dateStr = `${ano}-${mes}-${dia}`;
 
-    // Valida se a data é válida
     if (dateStr.includes('NaN')) {
       console.error('Data inválida gerada:', dateStr);
-      return '2025-01-13'; // fallback
+      return '2025-01-13'; 
     }
 
     return dateStr;
   } catch (error) {
     console.error('Erro ao gerar data:', error);
-    return '2025-01-13'; // fallback
+    return '2025-01-13'; 
   }
 };
 
@@ -79,16 +77,15 @@ const getCurrentMonth = (): string => {
     const mes = String(agora.getMonth() + 1).padStart(2, '0');
     const monthStr = `${ano}-${mes}`;
 
-    // Valida se o mês é válido
     if (monthStr.includes('NaN')) {
       console.error('Mês inválido gerado:', monthStr);
-      return '2025-01'; // fallback
+      return '2025-01'; 
     }
 
     return monthStr;
   } catch (error) {
     console.error('Erro ao gerar mês:', error);
-    return '2025-01'; // fallback
+    return '2025-01';
   }
 };
 
@@ -121,8 +118,6 @@ export default function TelaAgenda() {
         const monthToFetch = getCurrentMonth();
         const dayToFetch = getHoje();
 
-
-        // Busca dados do mês e dia atual assim que tiver o token
         await fetchMonthSchedule(monthToFetch, token);
         await fetchDaySchedule(dayToFetch, token);
       } else {
@@ -144,8 +139,6 @@ export default function TelaAgenda() {
         return;
       }
 
-
-      // Valida o formato do mês antes de enviar
       if (!month || month.includes('NaN') || month.length !== 7) {
         console.error('Mês inválido em fetchMonthSchedule:', month);
         return;
@@ -170,7 +163,6 @@ export default function TelaAgenda() {
         return;
       }
 
-      // Valida o formato do dia antes de enviar
       if (!day || day.includes('NaN') || day.length !== 10) {
         console.error('Dia inválido em fetchDaySchedule:', day);
         return;
@@ -204,9 +196,7 @@ export default function TelaAgenda() {
   const marcarDatas = () => {
     const marcacoes: any = {};
 
-    // Marca datas com eventos baseado no monthSchedule
     Object.keys(monthSchedule).forEach((dateStr) => {
-      // Converte DD/MM/YYYY para YYYY-MM-DD
       const parts = dateStr.split('/');
       if (parts.length === 3) {
         const [day, month, year] = parts;
@@ -237,7 +227,6 @@ export default function TelaAgenda() {
           },
         };
 
-        // Adiciona um ponto para indicar que há eventos
         if (hasEvent && !isSelected) {
           marcacoes[data].marked = true;
           marcacoes[data].dotColor = "#42cfe0";
@@ -245,7 +234,6 @@ export default function TelaAgenda() {
       }
     });
 
-    // Garante que hoje está sempre marcado
     if (!marcacoes[hoje]) {
       marcacoes[hoje] = {
         selected: hoje === dataSelecionada,

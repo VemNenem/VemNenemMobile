@@ -36,10 +36,8 @@ export interface DeleteResponse {
 }
 
 /**
- * Cria uma nova lista
- * @param jwt - Token JWT do usuário logado
- * @param data - Dados da lista (name)
- * Requer autenticação via JWT
+ * @param jwt
+ * @param data
  */
 export const createList = async (
     jwt: string,
@@ -91,10 +89,6 @@ export const createList = async (
     }
 };
 
-/**
- * Busca a lista de todas as listas
- * Requer autenticação via JWT
- */
 export const listList = async (jwt: string): Promise<ListResponse> => {
     try {
 
@@ -128,8 +122,6 @@ export const listList = async (jwt: string): Promise<ListResponse> => {
                 message: result.message || result.error?.message || 'Erro ao buscar listas',
             };
         }
-
-        // Garantir que result é um array
         const listas = Array.isArray(result) ? result : [];
 
         return {
@@ -146,11 +138,9 @@ export const listList = async (jwt: string): Promise<ListResponse> => {
 };
 
 /**
- * Atualiza uma lista existente
- * @param jwt - Token JWT do usuário logado
- * @param listDocumentId - Document ID da lista
- * @param data - Dados para atualização (name)
- * Requer autenticação via JWT
+ * @param jwt 
+ * @param listDocumentId
+ * @param data
  */
 export const updateList = async (
     jwt: string,
@@ -214,10 +204,8 @@ export const updateList = async (
 };
 
 /**
- * Deleta uma lista
- * @param jwt - Token JWT do usuário logado
- * @param listDocumentId - Document ID da lista
- * Requer autenticação via JWT
+ * @param jwt 
+ * @param listDocumentId
  */
 export const deleteList = async (
     jwt: string,
@@ -249,12 +237,9 @@ export const deleteList = async (
             }
         );
 
-        // Obter o texto da resposta primeiro
         const responseText = await response.text();
 
-        // Se a resposta não for ok
         if (!response.ok) {
-            // Tentar parsear como JSON
             try {
                 const result = JSON.parse(responseText);
                 return {
@@ -269,7 +254,6 @@ export const deleteList = async (
             }
         }
 
-        // Resposta foi ok - tentar parsear como JSON
         try {
             const result = JSON.parse(responseText);
             return {
@@ -277,7 +261,6 @@ export const deleteList = async (
                 message: result.message || 'Lista deletada com sucesso',
             };
         } catch {
-            // Se não for JSON válido, mas status é ok, considerar sucesso
             return {
                 success: true,
                 message: 'Lista deletada com sucesso',
@@ -293,9 +276,8 @@ export const deleteList = async (
 };
 
 /**
- * Formata a data para exibição
- * @param dateString - Data em formato ISO
- * @returns Data formatada (ex: "13/10/2025")
+ * @param dateString 
+ * @returns 
  */
 export const formatDate = (dateString: string): string => {
     try {
@@ -311,9 +293,8 @@ export const formatDate = (dateString: string): string => {
 };
 
 /**
- * Formata a data com hora para exibição
- * @param dateString - Data em formato ISO
- * @returns Data e hora formatadas (ex: "13/10/2025 às 22:14")
+ * @param dateString
+ * @returns 
  */
 export const formatDateTime = (dateString: string): string => {
     try {

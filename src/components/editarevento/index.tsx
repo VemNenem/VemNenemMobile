@@ -31,7 +31,6 @@ export default function ModalEditarEvento({
   const [descricao, setDescricao] = useState(descricaoInicial);
   const [time, setTime] = useState(timeInicial);
 
-  // Atualiza os campos quando o modal abre com novos dados
   useEffect(() => {
     if (visivel) {
       setTitulo(tituloInicial);
@@ -71,7 +70,6 @@ export default function ModalEditarEvento({
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            {/* Campo Título */}
             <Text style={styles.label}>Título</Text>
             <TextInput
               style={styles.input}
@@ -81,7 +79,6 @@ export default function ModalEditarEvento({
               onChangeText={setTitulo}
             />
 
-            {/* Campo Horário */}
             <Text style={styles.label}>Horário</Text>
             <TextInput
               style={styles.input}
@@ -91,7 +88,6 @@ export default function ModalEditarEvento({
               onChangeText={setTime}
             />
 
-            {/* Campo Descrição */}
             <Text style={styles.label}>Descrição</Text>
             <TextInput
               style={[styles.input, styles.inputDescricao]}
@@ -104,12 +100,10 @@ export default function ModalEditarEvento({
               textAlignVertical="top"
             />
 
-            {/* Botão Salvar */}
             <TouchableOpacity style={styles.botaoSalvar} onPress={handleSalvar}>
               <Text style={styles.textoBotaoSalvar}>SALVAR</Text>
             </TouchableOpacity>
 
-            {/* Botão Voltar */}
             <TouchableOpacity style={styles.botaoVoltar} onPress={handleVoltar}>
               <Text style={styles.textoBotaoVoltar}>CANCELAR</Text>
             </TouchableOpacity>

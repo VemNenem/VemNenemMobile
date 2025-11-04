@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   button: {
-    backgroundColor: '#42cfe0', // cor alterada aqui
+    backgroundColor: '#42cfe0', 
     paddingVertical: 12,
     borderRadius: 8,
     marginBottom: 10
@@ -89,13 +89,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   buttonOutline: {
-    borderColor: '#3b92e7', // cor da borda alterada aqui
+    borderColor: '#5dd4e3', 
     borderWidth: 1,
     paddingVertical: 12,
     borderRadius: 8
   },
   buttonOutlineText: {
-    color: '#3b92e7', // cor do texto alterada aqui
+    color: '#5dd4e3', 
     textAlign: 'center',
     fontWeight: 'bold'
   }

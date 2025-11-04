@@ -31,7 +31,6 @@ const PostScreen = () => {
   const carregarPost = async (postDocumentId: string) => {
     setCarregando(true);
     try {
-      // Buscar o JWT do usuário logado
       const jwt = await getStoredJWT();
 
       if (!jwt) {

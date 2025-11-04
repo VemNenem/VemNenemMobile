@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f5f5f5',
     },
     confirmButton: {
-        backgroundColor: '#007AFF',
+        backgroundColor: '#5dd4e3',
     },
     cancelText: {
         color: '#666',

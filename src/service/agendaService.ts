@@ -5,8 +5,8 @@ export interface Schedule {
     documentId: string;
     name: string;
     description: string;
-    date: string; // formato: YYYY-MM-DD
-    time: string; // formato: HH:mm
+    date: string;
+    time: string; 
     createdAt: string;
     updatedAt: string;
     publishedAt: string;
@@ -28,15 +28,15 @@ export interface DayScheduleResponse {
 export interface CreateScheduleData {
     name: string;
     description: string;
-    date: string; // formato: YYYY-MM-DD
-    time: string; // formato: HH:mm
+    date: string;
+    time: string; 
 }
 
 export interface UpdateScheduleData {
     name: string;
     description: string;
-    date: string; // formato: YYYY-MM-DD
-    time: string; // formato: HH:mm
+    date: string; 
+    time: string;
 }
 
 export interface ScheduleResponse {
@@ -50,9 +50,6 @@ export interface DeleteScheduleResponse {
     message?: string;
 }
 
-/**
- * Retorna a data atual no formato YYYY-MM-DD
- */
 const getCurrentDate = (): string => {
     const now = new Date();
     const year = now.getFullYear();
@@ -61,9 +58,6 @@ const getCurrentDate = (): string => {
     return `${year}-${month}-${day}`;
 };
 
-/**
- * Retorna o mês atual no formato YYYY-MM
- */
 const getCurrentMonth = (): string => {
     const now = new Date();
     const year = now.getFullYear();
@@ -71,13 +65,9 @@ const getCurrentMonth = (): string => {
     return `${year}-${month}`;
 };
 
-/**
- * Busca os eventos de um mês específico
- * Retorna um objeto com datas e se há eventos ou não
- */
 export const getMonthSchedule = async (
     jwt: string,
-    month?: string // formato: YYYY-MM (opcional, usa o mês atual se não fornecido)
+    month?: string 
 ): Promise<MonthScheduleResponse> => {
     try {
         if (!jwt) {
@@ -119,12 +109,9 @@ export const getMonthSchedule = async (
     }
 };
 
-/**
- * Busca os eventos de um dia específico
- */
 export const getDaySchedule = async (
     jwt: string,
-    day?: string // formato: YYYY-MM-DD (opcional, usa o dia atual se não fornecido)
+    day?: string 
 ): Promise<DayScheduleResponse> => {
     try {
         if (!jwt) {
@@ -166,9 +153,6 @@ export const getDaySchedule = async (
     }
 };
 
-/**
- * Cria um novo evento
- */
 export const createSchedule = async (
     jwt: string,
     data: CreateScheduleData
@@ -213,9 +197,6 @@ export const createSchedule = async (
     }
 };
 
-/**
- * Atualiza um evento existente
- */
 export const updateSchedule = async (
     jwt: string,
     scheduleDocumentId: string,
@@ -261,9 +242,6 @@ export const updateSchedule = async (
     }
 };
 
-/**
- * Deleta um evento
- */
 export const deleteSchedule = async (
     jwt: string,
     scheduleDocumentId: string
@@ -299,18 +277,15 @@ export const deleteSchedule = async (
             }
         }
 
-        // Lê a resposta uma única vez
         const contentType = response.headers.get('content-type');
 
         if (contentType && contentType.includes('application/json')) {
-            // Se for JSON, faz o parse
             const result = await response.json();
             return {
                 success: true,
                 message: result.message || 'Evento deletado com sucesso!',
             };
         } else {
-            // Se for texto ou outro formato
             const textResult = await response.text();
             return {
                 success: true,

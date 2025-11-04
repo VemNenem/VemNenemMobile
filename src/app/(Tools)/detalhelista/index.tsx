@@ -16,7 +16,6 @@ import { listTopic, createTopic, updateTopic, deleteTopic, Topic } from '@/src/s
 import { updateList } from '@/src/service/listaService';
 import { getStoredJWT } from '@/src/service/loginService';
 
-// Popup para criar/editar item
 interface ItemPopupProps {
   visible: boolean;
   onClose: () => void;
@@ -389,7 +388,6 @@ export default function DetalheLista() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color="#333" />
@@ -412,7 +410,6 @@ export default function DetalheLista() {
         </View>
       </View>
 
-      {/* Lista */}
       <FlatList
         data={itens}
         keyExtractor={(item) => item.documentId}
@@ -427,7 +424,6 @@ export default function DetalheLista() {
         onRefresh={handleRefresh}
       />
 
-      {/* Popup para adicionar item */}
       <ItemPopup
         visible={addPopupVisible}
         onClose={() => setAddPopupVisible(false)}
@@ -437,7 +433,6 @@ export default function DetalheLista() {
         confirmText="Adicionar"
       />
 
-      {/* Popup para editar item */}
       <ItemPopup
         visible={editPopupVisible}
         onClose={() => {
@@ -451,7 +446,6 @@ export default function DetalheLista() {
         initialValue={selectedItem?.name || ''}
       />
 
-      {/* Popup para editar nome da lista */}
       <ItemPopup
         visible={editListPopupVisible}
         onClose={() => setEditListPopupVisible(false)}

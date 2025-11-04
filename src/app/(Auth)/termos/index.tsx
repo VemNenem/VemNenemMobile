@@ -30,12 +30,10 @@ export default function TermosPrivacidade() {
       const resultado = await getTerms(tipoSelecionado);
 
       if (resultado.success && resultado.data) {
-        // Adapte conforme a estrutura real da resposta da API
         const texto = resultado.data.content || resultado.data.text || resultado.data.description || JSON.stringify(resultado.data, null, 2);
         setConteudo(texto);
       } else {
         Alert.alert("Erro", resultado.message || "Não foi possível carregar os termos.");
-        // Conteúdo padrão caso a API falhe
         setConteudo(getConteudoPadrao());
       }
     } catch (error) {
@@ -97,7 +95,6 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
         <View style={styles.card}>
           <Text style={styles.title}>Termos de Uso e Política de Privacidade</Text>
 
-          {/* Toggle entre Termos e Privacidade */}
           <View style={styles.switchContainer}>
             <TouchableOpacity
               style={[
@@ -146,7 +143,6 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
 
           <TouchableOpacity
             onPress={() => {
-              // Se veio do cadastro step 2, volta com o parâmetro
               if (params.returnStep) {
                 router.push({
                   pathname: '/(Auth)/cadastro',

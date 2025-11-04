@@ -19,20 +19,15 @@ export default function CabecalhoLogout({
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
       <View style={[styles.header, { backgroundColor }]}>
-        {/* Botão Voltar à esquerda */}
         <View style={styles.iconContainer}>
           <TouchableOpacity onPress={() => router.push('/(main)/blog')} accessibilityLabel="Voltar">
   <Ionicons name="chevron-back-outline" size={28} color={textColor} />
 </TouchableOpacity>
 
         </View>
-
-        {/* Título */}
         <View style={styles.titleContainer}>
           <Text style={[styles.title, { color: textColor }]}>{title}</Text>
         </View>
-
-        {/* Espaço reservado para manter alinhamento */}
         <View style={styles.iconContainer} />
       </View>
     </SafeAreaView>

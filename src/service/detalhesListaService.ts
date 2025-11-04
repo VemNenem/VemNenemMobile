@@ -37,10 +37,8 @@ export interface DeleteTopicResponse {
 }
 
 /**
- * Cria um novo tópico/item em uma lista
- * @param jwt - Token JWT do usuário logado
- * @param data - Dados do tópico (name e listDocumentId)
- * Requer autenticação via JWT
+ * @param jwt
+ * @param data
  */
 export const createTopic = async (
     jwt: string,
@@ -100,10 +98,8 @@ export const createTopic = async (
 };
 
 /**
- * Busca a lista de tópicos/itens de uma lista específica
- * @param jwt - Token JWT do usuário logado
- * @param listDocumentId - Document ID da lista
- * Requer autenticação via JWT
+ * @param jwt
+ * @param listDocumentId
  */
 export const listTopic = async (
     jwt: string,
@@ -143,8 +139,6 @@ export const listTopic = async (
                 message: result.message || result.error?.message || 'Erro ao buscar tópicos',
             };
         }
-
-        // Garantir que result é um array
         const topics = Array.isArray(result) ? result : [];
 
         return {
@@ -161,11 +155,9 @@ export const listTopic = async (
 };
 
 /**
- * Atualiza um tópico/item existente
- * @param jwt - Token JWT do usuário logado
- * @param topicDocumentId - Document ID do tópico
- * @param data - Dados para atualização (name)
- * Requer autenticação via JWT
+ * @param jwt
+ * @param topicDocumentId
+ * @param data
  */
 export const updateTopic = async (
     jwt: string,
@@ -229,10 +221,8 @@ export const updateTopic = async (
 };
 
 /**
- * Deleta um tópico/item
- * @param jwt - Token JWT do usuário logado
- * @param topicDocumentId - Document ID do tópico
- * Requer autenticação via JWT
+ * @param jwt
+ * @param topicDocumentId
  */
 export const deleteTopic = async (
     jwt: string,
@@ -264,10 +254,8 @@ export const deleteTopic = async (
             }
         );
 
-        // Obter o texto da resposta primeiro
         const responseText = await response.text();
 
-        // Se a resposta não for ok
         if (!response.ok) {
             try {
                 const result = JSON.parse(responseText);
@@ -283,7 +271,6 @@ export const deleteTopic = async (
             }
         }
 
-        // Resposta foi ok - tentar parsear como JSON
         try {
             const result = JSON.parse(responseText);
             return {
@@ -291,7 +278,6 @@ export const deleteTopic = async (
                 message: result.message || 'Tópico deletado com sucesso',
             };
         } catch {
-            // Se não for JSON válido, mas status é ok, considerar sucesso
             return {
                 success: true,
                 message: 'Tópico deletado com sucesso',

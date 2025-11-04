@@ -7,8 +7,7 @@ export interface TermsResponse {
 }
 
 /**
- * Busca os termos de uso ou política de privacidade
- * @param type - 'privacy' para Política de Privacidade ou 'terms' para Termos de Uso
+ * @param type
  */
 export const getTerms = async (
     type: 'privacy' | 'terms' = 'privacy'
@@ -28,14 +27,12 @@ export const getTerms = async (
             };
         }
 
-        // Verificar o tipo de conteúdo da resposta
         const contentType = response.headers.get('content-type');
         let result;
 
         if (contentType && contentType.includes('application/json')) {
             result = await response.json();
         } else {
-            // Se não for JSON, ler como texto
             const text = await response.text();
             result = { content: text };
         }

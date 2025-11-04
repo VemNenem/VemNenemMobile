@@ -28,10 +28,6 @@ export interface HomeResponse {
     data?: HomeData;
 }
 
-/**
- * Busca os dados da tela inicial (home)
- * Requer autenticação - passa o JWT do usuário logado
- */
 export const getHome = async (jwt: string): Promise<HomeResponse> => {
     try {
         if (!jwt) {

@@ -25,7 +25,6 @@ export default function Login() {
   const [carregando, setCarregando] = useState(false);
 
   const handleLogin = async () => {
-    // Validações
     if (!email.trim()) {
       Alert.alert("Erro", "Por favor, digite seu e-mail.");
       return;
@@ -42,7 +41,6 @@ export default function Login() {
       const resultado = await login(email.trim(), senha, lembrarMe);
 
       if (resultado.success) {
-        // Login bem-sucedido
         router.push({
           pathname: "/(Auth)/splash-hello",
           params: {
@@ -50,7 +48,6 @@ export default function Login() {
           },
         });
       } else {
-        // Erro no login
         Alert.alert(
           "Erro no Login",
           resultado.message || "Não foi possível fazer login. Verifique suas credenciais."

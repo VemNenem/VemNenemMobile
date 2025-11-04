@@ -69,9 +69,8 @@ export interface PostDetailResponse {
 }
 
 /**
- * Retorna a URL completa da imagem
- * @param imageUrl - URL relativa da imagem (ex: /uploads/imagem_teste_5f5df3513c.jpg)
- * @returns URL completa da imagem
+ * @param imageUrl
+ * @returns
  */
 export const getImageUrl = (imageUrl: string): string => {
     if (!imageUrl) return '';
@@ -79,10 +78,6 @@ export const getImageUrl = (imageUrl: string): string => {
     return `${BASE_URL}${imageUrl}`;
 };
 
-/**
- * Busca a lista de posts do blog
- * Requer autenticação via JWT
- */
 export const listPostsInClient = async (jwt: string): Promise<ListPostsResponse> => {
     try {
         if (!jwt) {
@@ -109,7 +104,6 @@ export const listPostsInClient = async (jwt: string): Promise<ListPostsResponse>
             };
         }
 
-        // Garantir que result é um array
         const posts = Array.isArray(result) ? result : [];
 
         return {
@@ -126,10 +120,8 @@ export const listPostsInClient = async (jwt: string): Promise<ListPostsResponse>
 };
 
 /**
- * Busca os detalhes de um post específico
- * @param jwt - Token JWT do usuário logado
- * @param postDocumentId - Document ID do post
- * Requer autenticação via JWT
+ * @param jwt
+ * @param postDocumentId
  */
 export const getPostsInClient = async (
     jwt: string,
@@ -184,9 +176,8 @@ export const getPostsInClient = async (
 };
 
 /**
- * Formata a data para exibição
- * @param dateString - Data em formato ISO
- * @returns Data formatada (ex: "01/10/2025")
+ * @param dateString
+ * @returns
  */
 export const formatDate = (dateString: string): string => {
     try {
@@ -202,9 +193,8 @@ export const formatDate = (dateString: string): string => {
 };
 
 /**
- * Formata a data com hora para exibição
- * @param dateString - Data em formato ISO
- * @returns Data e hora formatadas (ex: "01/10/2025 às 20:22")
+ * @param dateString
+ * @returns
  */
 export const formatDateTime = (dateString: string): string => {
     try {
@@ -222,10 +212,9 @@ export const formatDateTime = (dateString: string): string => {
 };
 
 /**
- * Trunca o texto para exibição em preview
- * @param text - Texto completo
- * @param maxLength - Tamanho máximo
- * @returns Texto truncado
+ * @param text
+ * @param maxLength
+ * @returns
  */
 export const truncateText = (text: string, maxLength: number = 100): string => {
     if (!text || text.length <= maxLength) return text;

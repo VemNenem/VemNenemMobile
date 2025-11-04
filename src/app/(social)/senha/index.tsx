@@ -29,7 +29,6 @@ const AlterarSenha = () => {
   const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
 
   const handleAlterarSenha = async () => {
-    // Validações
     if (!senhaAtual.trim()) {
       Alert.alert('Erro', 'Por favor, digite sua senha atual.');
       return;
