@@ -1,3 +1,6 @@
+//Tela de recuparação de senha
+
+// Importações do React e React Native
 import React, { useState } from "react";
 import {
   View,
@@ -14,20 +17,23 @@ import { useRouter } from "expo-router";
 import { forgotPassword } from '@/src/service/esqueciSenhaService';
 
 export default function RecuperarSenha() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const router = useRouter(); // Para navegação entre telas
+  const [email, setEmail] = useState(""); //Estado para armazenar o email digitado
+  const [loading, setLoading] = useState(false); //Estado apra indicar se está carregando
 
+  //Função chamada ao clicar no botão "ENVIAR"
   const handleEnviar = async () => {
     if (!email.trim()) {
       Alert.alert("Atenção", "Por favor, insira seu email");
       return;
     }
 
+    //Ativa o indicador de carregamento
     setLoading(true);
     try {
       const response = await forgotPassword({ email: email.trim() });
 
+      //Mostra o alerta de sucesso e redireciona para a tela de redefinição
       if (response.success) {
         Alert.alert(
           "Sucesso",
@@ -47,7 +53,7 @@ export default function RecuperarSenha() {
       console.error("Erro ao enviar email:", error);
       Alert.alert("Erro", "Erro ao enviar email de recuperação. Tente novamente.");
     } finally {
-      setLoading(false);
+      setLoading(false); //Desativa o indicador de carregamento
     }
   };
 
@@ -66,7 +72,7 @@ export default function RecuperarSenha() {
           <Text style={styles.description}>
             O email precisa ter sido cadastrado na plataforma anteriormente
           </Text>
-
+          {/* Input de email */}
           <Text style={styles.inputLabel}>Email</Text>
           <TextInput
             placeholder="Email"
@@ -80,6 +86,7 @@ export default function RecuperarSenha() {
             autoCorrect={false}
           />
 
+          {/* Botão para enviar email */}
           <TouchableOpacity
             style={[styles.continueButton, loading && styles.buttonDisabled]}
             onPress={handleEnviar}
@@ -92,6 +99,7 @@ export default function RecuperarSenha() {
             )}
           </TouchableOpacity>
 
+          {/* Botão para voltar */}
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}
@@ -104,7 +112,7 @@ export default function RecuperarSenha() {
     </ImageBackground>
   );
 }
-
+// Estilos
 const styles = StyleSheet.create({
   background: {
     flex: 1,

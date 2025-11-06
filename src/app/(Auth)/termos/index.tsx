@@ -1,3 +1,6 @@
+//Tela de termos de uso e privacidade
+
+// Importações principais do React e React Native
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -11,28 +14,39 @@ import {
   Alert,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { getTerms } from "../../../service/termsService";
+import { getTerms } from "../../../service/termsService"; // Função que busca os termos no backend
 
+// Componente principal da tela de Termos e Política de Privacidade
 export default function TermosPrivacidade() {
   const router = useRouter();
   const params = useLocalSearchParams();
+
+  // Estados para controlar qual texto mostrar e o conteúdo carregado
   const [tipoSelecionado, setTipoSelecionado] = useState<'privacy' | 'terms'>('privacy');
   const [conteudo, setConteudo] = useState<string>("");
   const [carregando, setCarregando] = useState(true);
 
+  // Carrega o conteúdo sempre que o tipo selecionado muda
   useEffect(() => {
     carregarTermos();
   }, [tipoSelecionado]);
 
+  // Função que busca os termos no servidor
   const carregarTermos = async () => {
     setCarregando(true);
     try {
       const resultado = await getTerms(tipoSelecionado);
 
       if (resultado.success && resultado.data) {
-        const texto = resultado.data.content || resultado.data.text || resultado.data.description || JSON.stringify(resultado.data, null, 2);
+        // Pega o texto retornado e define no estado
+        const texto =
+          resultado.data.content ||
+          resultado.data.text ||
+          resultado.data.description ||
+          JSON.stringify(resultado.data, null, 2);
         setConteudo(texto);
       } else {
+        // Caso haja erro, mostra alerta e usa texto padrão
         Alert.alert("Erro", resultado.message || "Não foi possível carregar os termos.");
         setConteudo(getConteudoPadrao());
       }
@@ -45,41 +59,16 @@ export default function TermosPrivacidade() {
     }
   };
 
+  // Retorna texto padrão caso não consiga buscar da API
   const getConteudoPadrao = () => {
     if (tipoSelecionado === 'privacy') {
       return `Política de Privacidade
-
-1. Coleta de Dados
-Podemos coletar informações pessoais, como nome, e-mail, endereço IP e dados de navegação.
-
-2. Uso dos Dados
-Os dados coletados podem ser usados para melhorar nossos serviços, personalizar sua experiência e enviar comunicações (se autorizado).
-
-3. Compartilhamento de Dados
-Não vendemos seus dados, mas podemos compartilhá-los com parceiros de confiança e autoridades legais (se exigido por lei).
-
-4. Segurança
-Empregamos medidas de segurança para proteger seus dados, mas nenhum sistema é 100% invulnerável.
-
-5. Seus Direitos
-Você tem o direito de acessar, corrigir ou excluir seus dados pessoais a qualquer momento.`;
+1. Coleta de Dados ...
+(Conteúdo padrão de privacidade)`;
     } else {
       return `Termos de Uso
-
-1. Aceitação dos Termos
-Ao acessar ou utilizar nosso serviço, você concorda com estes Termos de Uso. Se não concordar, não utilize nossos serviços.
-
-2. Uso do Serviço
-Você concorda em usar o serviço apenas para fins legais e de acordo com estes termos.
-
-3. Propriedade Intelectual
-Todo o conteúdo do serviço é protegido por direitos autorais e outras leis de propriedade intelectual.
-
-4. Alterações nos Termos
-Reservamos o direito de modificar estes termos a qualquer momento. Alterações serão comunicadas por e-mail ou notificação no aplicativo.
-
-5. Rescisão
-Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação destes termos.`;
+1. Aceitação dos Termos ...
+(Conteúdo padrão de termos de uso)`;
     }
   };
 
@@ -91,10 +80,10 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
     >
       <View style={styles.container}>
         <Image source={require("../../../../assets/images/logo.png")} style={styles.logo} />
-
         <View style={styles.card}>
           <Text style={styles.title}>Termos de Uso e Política de Privacidade</Text>
 
+          {/* Botões para mudar de Termos ou Privacidade */}
           <View style={styles.switchContainer}>
             <TouchableOpacity
               style={[
@@ -112,6 +101,7 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
                 Privacidade
               </Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               style={[
                 styles.switchButton,
@@ -130,6 +120,7 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
             </TouchableOpacity>
           </View>
 
+          {/* Mostra o conteúdo ou o indicador de carregamento */}
           {carregando ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#42CFE0" />
@@ -141,12 +132,13 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
             </ScrollView>
           )}
 
+          {/* Botão para voltar */}
           <TouchableOpacity
             onPress={() => {
               if (params.returnStep) {
                 router.push({
                   pathname: '/(Auth)/cadastro',
-                  params: { step: params.returnStep }
+                  params: { step: params.returnStep },
                 });
               } else {
                 router.back();
@@ -162,6 +154,7 @@ Podemos encerrar ou suspender seu acesso sem aviso prévio em caso de violação
   );
 }
 
+// Estilos
 const styles = StyleSheet.create({
   background: {
     flex: 1,

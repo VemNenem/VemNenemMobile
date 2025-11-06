@@ -1,30 +1,28 @@
+//Tela de cadastro
+
+// Importações do React e React Native
 import React, { useState, useEffect } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  ImageBackground,
-  ScrollView,
-  Alert,
-  ActivityIndicator,
-  Platform,
+  View, Text, TextInput, TouchableOpacity, StyleSheet,
+  Image, ImageBackground, ScrollView, Alert,
+  ActivityIndicator, Platform,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { createClient } from "../../../service/cadastroService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+// Chave para salvar dados temporários no dispositivo
 const TEMP_FORM_KEY = '@cadastro_temp_form';
 
 export default function Cadastro() {
-  const router = useRouter();
-  const params = useLocalSearchParams();
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const router = useRouter(); // Para navegação entre telas
+  const params = useLocalSearchParams(); // Parâmetros da URL
+  const [step, setStep] = useState(1); // Controla qual etapa do cadastro (1 ou 2)
+  const [loading, setLoading] = useState(false); // Indica se está processando
+  const [acceptedTerms, setAcceptedTerms] = useState(false); // Se aceitou os termos
+  
+  // Dados do formulário
   const [formData, setFormData] = useState({
     nome: "",
     email: "",
@@ -35,23 +33,27 @@ export default function Cadastro() {
     nomePai: "",
   });
 
-  const [dppDate, setDppDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [dppDate, setDppDate] = useState(new Date()); // Data em formato Date
+  const [showDatePicker, setShowDatePicker] = useState(false); // Mostra/oculta seletor de data
 
+  // Carrega dados salvos quando a tela abre
   useEffect(() => {
     loadTempFormData();
   }, []);
 
+  // Atualiza a etapa se vier da URL
   useEffect(() => {
     if (params.step) {
       setStep(Number(params.step));
     }
   }, [params.step]);
 
+  // Salva dados automaticamente quando o formulário muda
   useEffect(() => {
     saveTempFormData();
   }, [formData]);
 
+  // Carrega dados salvos do AsyncStorage
   const loadTempFormData = async () => {
     try {
       const savedData = await AsyncStorage.getItem(TEMP_FORM_KEY);
@@ -68,6 +70,7 @@ export default function Cadastro() {
     }
   };
 
+  // Salva dados no AsyncStorage
   const saveTempFormData = async () => {
     try {
       await AsyncStorage.setItem(TEMP_FORM_KEY, JSON.stringify(formData));
@@ -76,6 +79,7 @@ export default function Cadastro() {
     }
   };
 
+  // Remove dados salvos
   const clearTempFormData = async () => {
     try {
       await AsyncStorage.removeItem(TEMP_FORM_KEY);
@@ -84,16 +88,19 @@ export default function Cadastro() {
     }
   };
 
+  // Atualiza um campo específico do formulário
   const handleChange = (name: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Converte data de DD/MM/AAAA para AAAA-MM-DD
   const convertDateToISO = (dateString: string): string => {
     if (!dateString) return "";
     const [day, month, year] = dateString.split("/");
     return `${year}-${month}-${day}`;
   };
 
+  // Quando usuário seleciona uma data
   const handleDateChange = (event: any, selectedDate?: Date) => {
     setShowDatePicker(false);
     if (selectedDate) {
@@ -103,8 +110,10 @@ export default function Cadastro() {
     }
   };
 
+  // Processa o envio do formulário
   const handleSubmit = async () => {
     if (step === 1) {
+      // Validação da etapa 1
       if (!formData.nome || !formData.email || !formData.senha) {
         Alert.alert("Erro", "Preencha todos os campos obrigatórios");
         return;
@@ -116,24 +125,23 @@ export default function Cadastro() {
         return;
       }
 
-      setStep(2);
+      setStep(2); // Avança para próxima etapa
     } else {
+      // Validação da etapa 2
       if (!formData.dpp || !formData.sexoBebe) {
         Alert.alert("Erro", "Preencha todos os campos obrigatórios");
         return;
       }
 
       if (!acceptedTerms) {
-        Alert.alert(
-          "Atenção",
-          "Você precisa aceitar os Termos de Uso e Política de Privacidade para continuar"
-        );
+        Alert.alert("Atenção", "Você precisa aceitar os Termos de Uso e Política de Privacidade para continuar");
         return;
       }
 
       setLoading(true);
 
       try {
+        // Envia dados para API
         const result = await createClient({
           name: formData.nome,
           email: formData.email,
@@ -146,16 +154,9 @@ export default function Cadastro() {
 
         if (result.success) {
           await clearTempFormData();
-          Alert.alert(
-            "Sucesso",
-            "Cadastro realizado com sucesso! Faça login para acessar o aplicativo.",
-            [
-              {
-                text: "OK",
-                onPress: () => router.push("/"),
-              },
-            ]
-          );
+          Alert.alert("Sucesso", "Cadastro realizado com sucesso! Faça login para acessar o aplicativo.", [
+            { text: "OK", onPress: () => router.push("/") }
+          ]);
         } else {
           Alert.alert("Erro", result.message || "Erro ao realizar cadastro");
         }
@@ -167,64 +168,36 @@ export default function Cadastro() {
     }
   };
 
+  // Valida requisitos de segurança da senha
   const validarSenha = (senha: string): { valida: boolean; mensagem: string } => {
     if (senha.length < 8) {
-      return {
-        valida: false,
-        mensagem: "A senha deve ter pelo menos 8 caracteres",
-      };
+      return { valida: false, mensagem: "A senha deve ter pelo menos 8 caracteres" };
     }
-
     if (!/[a-z]/.test(senha)) {
-      return {
-        valida: false,
-        mensagem: "A senha deve conter pelo menos uma letra minúscula",
-      };
+      return { valida: false, mensagem: "A senha deve conter pelo menos uma letra minúscula" };
     }
-
     if (!/[A-Z]/.test(senha)) {
-      return {
-        valida: false,
-        mensagem: "A senha deve conter pelo menos uma letra maiúscula",
-      };
+      return { valida: false, mensagem: "A senha deve conter pelo menos uma letra maiúscula" };
     }
-
     if (!/[0-9]/.test(senha)) {
-      return {
-        valida: false,
-        mensagem: "A senha deve conter pelo menos um número",
-      };
+      return { valida: false, mensagem: "A senha deve conter pelo menos um número" };
     }
-
     if (!/[@#$%&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(senha)) {
-      return {
-        valida: false,
-        mensagem: "A senha deve conter pelo menos um caractere especial (@#$%&*...)",
-      };
+      return { valida: false, mensagem: "A senha deve conter pelo menos um caractere especial (@#$%&*...)" };
     }
-
-    return {
-      valida: true,
-      mensagem: "",
-    };
+    return { valida: true, mensagem: "" };
   };
 
   return (
-    <ImageBackground
-      source={require("../../../../assets/images/background.png")}
-      style={styles.background}
-      resizeMode="cover"
-    >
+    <ImageBackground source={require("../../../../assets/images/background.png")} style={styles.background} resizeMode="cover">
       <View style={styles.container}>
-        <Image
-          source={require("../../../../assets/images/logo.png")}
-          style={styles.logo}
-        />
+        <Image source={require("../../../../assets/images/logo.png")} style={styles.logo} />
 
         <View style={styles.card}>
           <Text style={styles.title}>Cadastro</Text>
 
           {step === 1 ? (
+            // Etapa 1: Dados pessoais
             <ScrollView style={styles.formContainer}>
               <View style={styles.fieldContainer}>
                 <Text style={styles.inputLabel}>Nome</Text>
@@ -260,19 +233,16 @@ export default function Cadastro() {
                   placeholderTextColor="#aaa"
                 />
                 <Text style={styles.passwordHint}>
-                  Use pelo menos 8 caracteres, incluindo 1 letra minúscula, 1
-                  maiúscula, 1 número e 1 caractere especial (como @#$%)
+                  Use pelo menos 8 caracteres, incluindo 1 letra minúscula, 1 maiúscula, 1 número e 1 caractere especial (como @#$%)
                 </Text>
               </View>
             </ScrollView>
           ) : (
+            // Etapa 2: Dados do bebê
             <ScrollView style={styles.formContainer}>
               <View style={styles.fieldContainer}>
                 <Text style={styles.inputLabel}>DPP (Data Provável do Parto)</Text>
-                <TouchableOpacity
-                  style={styles.dateInput}
-                  onPress={() => setShowDatePicker(true)}
-                >
+                <TouchableOpacity style={styles.dateInput} onPress={() => setShowDatePicker(true)}>
                   <Text style={formData.dpp ? styles.dateText : styles.placeholderText}>
                     {formData.dpp || "Selecione a data"}
                   </Text>
@@ -292,34 +262,18 @@ export default function Cadastro() {
                 <Text style={styles.inputLabel}>Sexo do bebê</Text>
                 <View style={styles.radioContainer}>
                   <TouchableOpacity
-                    style={[
-                      styles.radioButton,
-                      formData.sexoBebe === "Masculino" && styles.radioSelected,
-                    ]}
+                    style={[styles.radioButton, formData.sexoBebe === "Masculino" && styles.radioSelected]}
                     onPress={() => handleChange("sexoBebe", "Masculino")}
                   >
-                    <Text
-                      style={[
-                        styles.radioText,
-                        formData.sexoBebe === "Masculino" && { color: "#fff" },
-                      ]}
-                    >
+                    <Text style={[styles.radioText, formData.sexoBebe === "Masculino" && { color: "#fff" }]}>
                       Masculino
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[
-                      styles.radioButton,
-                      formData.sexoBebe === "Feminino" && styles.radioSelected,
-                    ]}
+                    style={[styles.radioButton, formData.sexoBebe === "Feminino" && styles.radioSelected]}
                     onPress={() => handleChange("sexoBebe", "Feminino")}
                   >
-                    <Text
-                      style={[
-                        styles.radioText,
-                        formData.sexoBebe === "Feminino" && { color: "#fff" },
-                      ]}
-                    >
+                    <Text style={[styles.radioText, formData.sexoBebe === "Feminino" && { color: "#fff" }]}>
                       Feminino
                     </Text>
                   </TouchableOpacity>
@@ -337,37 +291,24 @@ export default function Cadastro() {
                 />
               </View>
 
+              {/* Checkbox dos termos */}
               <View style={styles.termsContainer}>
-                <TouchableOpacity
-                  style={styles.checkbox}
-                  onPress={() => setAcceptedTerms(!acceptedTerms)}
-                >
-                  <View
-                    style={[
-                      styles.checkboxBox,
-                      acceptedTerms && styles.checkboxChecked,
-                    ]}
-                  >
+                <TouchableOpacity style={styles.checkbox} onPress={() => setAcceptedTerms(!acceptedTerms)}>
+                  <View style={[styles.checkboxBox, acceptedTerms && styles.checkboxChecked]}>
                     {acceptedTerms && <Text style={styles.checkmark}>✓</Text>}
                   </View>
                 </TouchableOpacity>
                 <View style={styles.termsTextContainer}>
                   <Text style={styles.termsText}>Li e aceito os </Text>
-                  <TouchableOpacity
-                    onPress={() => router.push({
-                      pathname: '/(Auth)/termos',
-                      params: { returnStep: '2' }
-                    })}
-                  >
-                    <Text style={styles.termsLink}>
-                      Termos de Uso e Política de Privacidade
-                    </Text>
+                  <TouchableOpacity onPress={() => router.push({ pathname: '/(Auth)/termos', params: { returnStep: '2' } })}>
+                    <Text style={styles.termsLink}>Termos de Uso e Política de Privacidade</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             </ScrollView>
           )}
 
+          {/* Botões de ação */}
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
               style={[styles.continueButton, loading && styles.buttonDisabled]}
@@ -404,6 +345,7 @@ export default function Cadastro() {
   );
 }
 
+// Estilos
 const styles = StyleSheet.create({
   background: {
     flex: 1,
