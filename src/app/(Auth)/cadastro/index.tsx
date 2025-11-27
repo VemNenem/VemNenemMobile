@@ -7,6 +7,7 @@ import {
   Image, ImageBackground, ScrollView, Alert,
   ActivityIndicator, Platform,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { createClient } from "../../../service/cadastroService";
@@ -21,7 +22,8 @@ export default function Cadastro() {
   const [step, setStep] = useState(1); // Controla qual etapa do cadastro (1 ou 2)
   const [loading, setLoading] = useState(false); // Indica se está processando
   const [acceptedTerms, setAcceptedTerms] = useState(false); // Se aceitou os termos
-  
+  const [showPassword, setShowPassword] = useState(false); // Controla visibilidade da senha
+
   // Dados do formulário
   const [formData, setFormData] = useState({
     nome: "",
@@ -104,6 +106,26 @@ export default function Cadastro() {
   const handleDateChange = (event: any, selectedDate?: Date) => {
     setShowDatePicker(false);
     if (selectedDate) {
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+
+      // Data máxima: 9 meses (270 dias) a partir de hoje
+      const dataMaxima = new Date();
+      dataMaxima.setDate(dataMaxima.getDate() + 270);
+      dataMaxima.setHours(23, 59, 59, 999);
+
+      // Validação: não permite data passada
+      if (selectedDate < hoje) {
+        Alert.alert("Data inválida", "A data provável do parto não pode ser no passado");
+        return;
+      }
+
+      // Validação: não permite data superior a 9 meses
+      if (selectedDate > dataMaxima) {
+        Alert.alert("Data inválida", "A data provável do parto não pode ser superior a 9 meses a partir de hoje");
+        return;
+      }
+
       setDppDate(selectedDate);
       const formattedDate = selectedDate.toLocaleDateString("pt-BR");
       handleChange("dpp", formattedDate);
@@ -224,14 +246,26 @@ export default function Cadastro() {
 
               <View style={styles.fieldContainer}>
                 <Text style={styles.inputLabel}>Senha</Text>
-                <TextInput
-                  value={formData.senha}
-                  onChangeText={(text) => handleChange("senha", text)}
-                  secureTextEntry
-                  style={styles.input}
-                  placeholder="Digite sua senha"
-                  placeholderTextColor="#aaa"
-                />
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    value={formData.senha}
+                    onChangeText={(text) => handleChange("senha", text)}
+                    secureTextEntry={!showPassword}
+                    style={styles.passwordInput}
+                    placeholder="Digite sua senha"
+                    placeholderTextColor="#aaa"
+                  />
+                  <TouchableOpacity
+                    style={styles.eyeIcon}
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
+                    <Ionicons
+                      name={showPassword ? "eye-off" : "eye"}
+                      size={24}
+                      color="#707070"
+                    />
+                  </TouchableOpacity>
+                </View>
                 <Text style={styles.passwordHint}>
                   Use pelo menos 8 caracteres, incluindo 1 letra minúscula, 1 maiúscula, 1 número e 1 caractere especial (como @#$%)
                 </Text>
@@ -404,6 +438,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#000",
     backgroundColor: "#fff",
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    height: 48,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    backgroundColor: "#fff",
+  },
+  passwordInput: {
+    flex: 1,
+    height: "100%",
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: "#000",
+  },
+  eyeIcon: {
+    paddingHorizontal: 12,
+    justifyContent: "center",
+    alignItems: "center",
   },
   dateInput: {
     width: "100%",

@@ -27,6 +27,28 @@ export default function ModalAdicionarEvento({
   const [descricao, setDescricao] = useState("");
   const [time, setTime] = useState("");
 
+  const formatarHorario = (texto: string) => {
+    const apenasNumeros = texto.replace(/[^0-9]/g, '');
+
+    if (apenasNumeros.length === 0) return '';
+    if (apenasNumeros.length <= 2) return apenasNumeros;
+
+    const horas = apenasNumeros.substring(0, 2);
+    const minutos = apenasNumeros.substring(2, 4);
+
+    return `${horas}:${minutos}`;
+  };
+
+  const validarHorario = (horario: string): boolean => {
+    const regex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+    return regex.test(horario);
+  };
+
+  const handleTimeChange = (texto: string) => {
+    const horarioFormatado = formatarHorario(texto);
+    setTime(horarioFormatado);
+  };
+
   const handleSalvar = () => {
     if (titulo.trim() === "") {
       alert("Por favor, insira um título");
@@ -35,6 +57,11 @@ export default function ModalAdicionarEvento({
 
     if (time.trim() === "") {
       alert("Por favor, insira um horário");
+      return;
+    }
+
+    if (!validarHorario(time)) {
+      alert("Por favor, insira um horário válido no formato HH:mm (ex: 14:30)");
       return;
     }
 
@@ -79,7 +106,9 @@ export default function ModalAdicionarEvento({
               placeholder="HH:mm (ex: 14:30)"
               placeholderTextColor="#999"
               value={time}
-              onChangeText={setTime}
+              onChangeText={handleTimeChange}
+              keyboardType="numeric"
+              maxLength={5}
             />
 
             <Text style={styles.label}>Descrição</Text>
