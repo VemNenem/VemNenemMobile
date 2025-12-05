@@ -1,6 +1,17 @@
 import { getStoredJWT } from './loginService';
 
 const API_URL = 'https://api.vemnenem.app.br/api';
+const REQUEST_TIMEOUT = 10000; // 10 segundos
+
+// Função helper para adicionar timeout nas requisições
+const fetchWithTimeout = (url: string, options: RequestInit, timeout = REQUEST_TIMEOUT): Promise<Response> => {
+    return Promise.race([
+        fetch(url, options),
+        new Promise<Response>((_, reject) =>
+            setTimeout(() => reject(new Error('Timeout: A requisição demorou muito')), timeout)
+        )
+    ]);
+};
 
 export interface ChildbirthPlan {
     documentId: string;
@@ -23,7 +34,7 @@ export interface SelectPlanResponse {
 export interface PDFResponse {
     success: boolean;
     message?: string;
-    data?: string; 
+    data?: string;
 }
 
 export const listChildbirthPlans = async (): Promise<ListChildbirthPlanResponse> => {
@@ -37,7 +48,7 @@ export const listChildbirthPlans = async (): Promise<ListChildbirthPlanResponse>
             };
         }
 
-        const response = await fetch(`${API_URL}/listChildbirthPlan`, {
+        const response = await fetchWithTimeout(`${API_URL}/listChildbirthPlan`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -81,7 +92,7 @@ export const selectOrUnselectChildbirthPlan = async (
             };
         }
 
-        const response = await fetch(
+        const response = await fetchWithTimeout(
             `${API_URL}/selectOrUnselectChildbirthPlan?planDocumentId=${planDocumentId}`,
             {
                 method: 'PATCH',
@@ -126,7 +137,7 @@ export const generateChildbirthPlanPDF = async (): Promise<PDFResponse> => {
             };
         }
 
-        const response = await fetch(`${API_URL}/pdfChildbirthPlan`, {
+        const response = await fetchWithTimeout(`${API_URL}/pdfChildbirthPlan`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${jwt}`,

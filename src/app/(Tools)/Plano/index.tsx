@@ -72,22 +72,39 @@ export default function PlanoDeParto() {
   const toggleCheck = async (plan: ChildbirthPlan) => {
     const action = plan.clientSelect ? 'unselect' : 'select';
 
+    // Atualização otimista - muda o estado imediatamente
+    setChildbirthPlans(prevPlans =>
+      prevPlans.map(p =>
+        p.documentId === plan.documentId
+          ? { ...p, clientSelect: !p.clientSelect }
+          : p
+      )
+    );
+
     try {
       const response = await selectOrUnselectChildbirthPlan(plan.documentId, action);
 
-      if (response.success) {
+      if (!response.success) {
+        // Se falhar, reverte a mudança
         setChildbirthPlans(prevPlans =>
           prevPlans.map(p =>
             p.documentId === plan.documentId
-              ? { ...p, clientSelect: !p.clientSelect }
+              ? { ...p, clientSelect: plan.clientSelect }
               : p
           )
         );
-      } else {
         Alert.alert('Erro', response.message || 'Erro ao atualizar plano');
       }
     } catch (error) {
       console.error('Erro ao atualizar plano:', error);
+      // Reverte a mudança em caso de erro
+      setChildbirthPlans(prevPlans =>
+        prevPlans.map(p =>
+          p.documentId === plan.documentId
+            ? { ...p, clientSelect: plan.clientSelect }
+            : p
+        )
+      );
       Alert.alert('Erro', 'Erro ao atualizar plano');
     }
   };

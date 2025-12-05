@@ -12,6 +12,9 @@ import {
     ImageBackground,
     Alert,
     ActivityIndicator,
+    KeyboardAvoidingView,
+    ScrollView,
+    Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { resetPassword } from '@/src/service/esqueciSenhaService';
@@ -119,108 +122,119 @@ export default function RedefinirSenha() {
             style={styles.background}
             resizeMode="cover"
         >
-            <View style={styles.container}>
-                <Image source={require("../../../../assets/images/logo.png")} style={styles.logo} />
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                style={styles.keyboardView}
+            >
+                <ScrollView
+                    contentContainerStyle={styles.scrollContent}
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                >
+                    <View style={styles.container}>
+                        <Image source={require("../../../../assets/images/logo.png")} style={styles.logo} />
 
-                <View style={styles.card}>
-                    <Text style={styles.title}>Redefinir senha</Text>
+                        <View style={styles.card}>
+                            <Text style={styles.title}>Redefinir senha</Text>
 
-                    <Text style={styles.description}>
-                        Digite o código recebido por email e sua nova senha
-                    </Text>
+                            <Text style={styles.description}>
+                                Digite o código recebido por email e sua nova senha
+                            </Text>
 
-                    {/* Input de código */}
-                    <Text style={styles.inputLabel}>Código de verificação</Text>
-                    <TextInput
-                        placeholder="Digite o código"
-                        style={styles.input}
-                        placeholderTextColor="#707070"
-                        value={token}
-                        onChangeText={setToken}
-                        editable={!loading}
-                        autoCapitalize="characters"
-                        autoCorrect={false}
-                        maxLength={6}
-                    />
+                            {/* Input de código */}
+                            <Text style={styles.inputLabel}>Código de verificação</Text>
+                            <TextInput
+                                placeholder="Digite o código"
+                                style={styles.input}
+                                placeholderTextColor="#707070"
+                                value={token}
+                                onChangeText={setToken}
+                                editable={!loading}
+                                autoCapitalize="characters"
+                                autoCorrect={false}
+                                maxLength={6}
+                            />
 
-                    {/* Input */}
-                    <Text style={styles.inputLabel}>Nova senha</Text>
-                    <View style={styles.passwordContainer}>
-                        <TextInput
-                            placeholder="Digite sua nova senha"
-                            secureTextEntry={!showPassword}
-                            style={styles.passwordInput}
-                            placeholderTextColor="#707070"
-                            value={password}
-                            onChangeText={setPassword}
-                            editable={!loading}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                        />
-                        {/* Botão para mostrar/ocultar senha */}
-                        <TouchableOpacity
-                            onPress={() => setShowPassword(!showPassword)}
-                            style={styles.eyeIcon}
-                        >
-                            <Text style={styles.eyeText}>{showPassword ? "👁️" : "👁️‍🗨️"}</Text>
-                        </TouchableOpacity>
+                            {/* Input */}
+                            <Text style={styles.inputLabel}>Nova senha</Text>
+                            <View style={styles.passwordContainer}>
+                                <TextInput
+                                    placeholder="Digite sua nova senha"
+                                    secureTextEntry={!showPassword}
+                                    style={styles.passwordInput}
+                                    placeholderTextColor="#707070"
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    editable={!loading}
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                />
+                                {/* Botão para mostrar/ocultar senha */}
+                                <TouchableOpacity
+                                    onPress={() => setShowPassword(!showPassword)}
+                                    style={styles.eyeIcon}
+                                >
+                                    <Text style={styles.eyeText}>{showPassword ? "👁️" : "👁️‍🗨️"}</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            {/* Regras de senha */}
+                            <View style={styles.regrasContainer}>
+                                <Text style={styles.regrasText}>• Use pelo menos 8 caracteres</Text>
+                                <Text style={styles.regrasText}>
+                                    • Inclua 1 letra minúscula, 1 maiúscula e 1 caractere especial
+                                </Text>
+                                <Text style={styles.regrasText}>• Use uma senha forte</Text>
+                            </View>
+
+                            {/* Input*/}
+                            <Text style={styles.inputLabel}>Confirmar nova senha</Text>
+                            <View style={styles.passwordContainer}>
+                                <TextInput
+                                    placeholder="Confirme sua nova senha"
+                                    secureTextEntry={!showConfirmPassword}
+                                    style={styles.passwordInput}
+                                    placeholderTextColor="#707070"
+                                    value={confirmPassword}
+                                    onChangeText={setConfirmPassword}
+                                    editable={!loading}
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                />
+                                {/* Botão para mostrar/ocultar confirmação */}
+                                <TouchableOpacity
+                                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    style={styles.eyeIcon}
+                                >
+                                    <Text style={styles.eyeText}>{showConfirmPassword ? "👁️" : "👁️‍🗨️"}</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            {/* Botão de redefinir */}
+                            <TouchableOpacity
+                                style={[styles.continueButton, loading && styles.buttonDisabled]}
+                                onPress={handleRedefinir}
+                                disabled={loading}
+                            >
+                                {loading ? (
+                                    <ActivityIndicator color="#fff" size="small" />
+                                ) : (
+                                    <Text style={styles.continueButtonText}>REDEFINIR SENHA</Text>
+                                )}
+                            </TouchableOpacity>
+
+                            {/* Botão de voltar */}
+                            <TouchableOpacity
+                                style={styles.backButton}
+                                onPress={() => router.back()}
+                                disabled={loading}
+                            >
+                                <Text style={styles.backButtonText}>VOLTAR</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-
-                    {/* Regras de senha */}
-                    <View style={styles.regrasContainer}>
-                        <Text style={styles.regrasText}>• Use pelo menos 8 caracteres</Text>
-                        <Text style={styles.regrasText}>
-                            • Inclua 1 letra minúscula, 1 maiúscula e 1 caractere especial
-                        </Text>
-                        <Text style={styles.regrasText}>• Use uma senha forte</Text>
-                    </View>
-
-                    {/* Input*/}
-                    <Text style={styles.inputLabel}>Confirmar nova senha</Text>
-                    <View style={styles.passwordContainer}>
-                        <TextInput
-                            placeholder="Confirme sua nova senha"
-                            secureTextEntry={!showConfirmPassword}
-                            style={styles.passwordInput}
-                            placeholderTextColor="#707070"
-                            value={confirmPassword}
-                            onChangeText={setConfirmPassword}
-                            editable={!loading}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                        />
-                        {/* Botão para mostrar/ocultar confirmação */}
-                        <TouchableOpacity
-                            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                            style={styles.eyeIcon}
-                        >
-                            <Text style={styles.eyeText}>{showConfirmPassword ? "👁️" : "👁️‍🗨️"}</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    {/* Botão de redefinir */}
-                    <TouchableOpacity
-                        style={[styles.continueButton, loading && styles.buttonDisabled]}
-                        onPress={handleRedefinir}
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <ActivityIndicator color="#fff" size="small" />
-                        ) : (
-                            <Text style={styles.continueButtonText}>REDEFINIR SENHA</Text>
-                        )}
-                    </TouchableOpacity>
-
-                    {/* Botão de voltar */}
-                    <TouchableOpacity
-                        style={styles.backButton}
-                        onPress={() => router.back()}
-                        disabled={loading}
-                    >
-                        <Text style={styles.backButtonText}>VOLTAR</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
         </ImageBackground>
     );
 }
@@ -231,6 +245,12 @@ const styles = StyleSheet.create({
         flex: 1,
         width: "100%",
         height: "100%",
+    },
+    keyboardView: {
+        flex: 1,
+    },
+    scrollContent: {
+        flexGrow: 1,
         justifyContent: "center",
         alignItems: "center",
     },

@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   Image, ImageBackground, ScrollView, Alert,
-  ActivityIndicator, Platform,
+  ActivityIndicator, Platform, KeyboardAvoidingView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
@@ -212,169 +212,180 @@ export default function Cadastro() {
 
   return (
     <ImageBackground source={require("../../../../assets/images/background.png")} style={styles.background} resizeMode="cover">
-      <View style={styles.container}>
-        <Image source={require("../../../../assets/images/logo.png")} style={styles.logo} />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardView}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.container}>
+            <Image source={require("../../../../assets/images/logo.png")} style={styles.logo} />
 
-        <View style={styles.card}>
-          <Text style={styles.title}>Cadastro</Text>
+            <View style={styles.card}>
+              <Text style={styles.title}>Cadastro</Text>
 
-          {step === 1 ? (
-            // Etapa 1: Dados pessoais
-            <ScrollView style={styles.formContainer}>
-              <View style={styles.fieldContainer}>
-                <Text style={styles.inputLabel}>Nome</Text>
-                <TextInput
-                  value={formData.nome}
-                  onChangeText={(text) => handleChange("nome", text)}
-                  style={styles.input}
-                  placeholder="Digite seu nome"
-                  placeholderTextColor="#aaa"
-                />
-              </View>
-
-              <View style={styles.fieldContainer}>
-                <Text style={styles.inputLabel}>E-mail</Text>
-                <TextInput
-                  value={formData.email}
-                  onChangeText={(text) => handleChange("email", text)}
-                  keyboardType="email-address"
-                  style={styles.input}
-                  placeholder="Digite seu e-mail"
-                  placeholderTextColor="#aaa"
-                />
-              </View>
-
-              <View style={styles.fieldContainer}>
-                <Text style={styles.inputLabel}>Senha</Text>
-                <View style={styles.passwordContainer}>
-                  <TextInput
-                    value={formData.senha}
-                    onChangeText={(text) => handleChange("senha", text)}
-                    secureTextEntry={!showPassword}
-                    style={styles.passwordInput}
-                    placeholder="Digite sua senha"
-                    placeholderTextColor="#aaa"
-                  />
-                  <TouchableOpacity
-                    style={styles.eyeIcon}
-                    onPress={() => setShowPassword(!showPassword)}
-                  >
-                    <Ionicons
-                      name={showPassword ? "eye-off" : "eye"}
-                      size={24}
-                      color="#707070"
+              {step === 1 ? (
+                // Etapa 1: Dados pessoais
+                <ScrollView style={styles.formContainer}>
+                  <View style={styles.fieldContainer}>
+                    <Text style={styles.inputLabel}>Nome</Text>
+                    <TextInput
+                      value={formData.nome}
+                      onChangeText={(text) => handleChange("nome", text)}
+                      style={styles.input}
+                      placeholder="Digite seu nome"
+                      placeholderTextColor="#aaa"
                     />
-                  </TouchableOpacity>
-                </View>
-                <Text style={styles.passwordHint}>
-                  Use pelo menos 8 caracteres, incluindo 1 letra minúscula, 1 maiúscula, 1 número e 1 caractere especial (como @#$%)
-                </Text>
-              </View>
-            </ScrollView>
-          ) : (
-            // Etapa 2: Dados do bebê
-            <ScrollView style={styles.formContainer}>
-              <View style={styles.fieldContainer}>
-                <Text style={styles.inputLabel}>DPP (Data Provável do Parto)</Text>
-                <TouchableOpacity style={styles.dateInput} onPress={() => setShowDatePicker(true)}>
-                  <Text style={formData.dpp ? styles.dateText : styles.placeholderText}>
-                    {formData.dpp || "Selecione a data"}
-                  </Text>
-                </TouchableOpacity>
-                {showDatePicker && (
-                  <DateTimePicker
-                    value={dppDate}
-                    mode="date"
-                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                    locale="pt-BR"
-                    onChange={handleDateChange}
-                  />
-                )}
-              </View>
-
-              <View style={styles.fieldContainer}>
-                <Text style={styles.inputLabel}>Sexo do bebê</Text>
-                <View style={styles.radioContainer}>
-                  <TouchableOpacity
-                    style={[styles.radioButton, formData.sexoBebe === "Masculino" && styles.radioSelected]}
-                    onPress={() => handleChange("sexoBebe", "Masculino")}
-                  >
-                    <Text style={[styles.radioText, formData.sexoBebe === "Masculino" && { color: "#fff" }]}>
-                      Masculino
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.radioButton, formData.sexoBebe === "Feminino" && styles.radioSelected]}
-                    onPress={() => handleChange("sexoBebe", "Feminino")}
-                  >
-                    <Text style={[styles.radioText, formData.sexoBebe === "Feminino" && { color: "#fff" }]}>
-                      Feminino
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              <View style={styles.fieldContainer}>
-                <Text style={styles.inputLabel}>Nome do bebê</Text>
-                <TextInput
-                  value={formData.nomeBebe}
-                  onChangeText={(text) => handleChange("nomeBebe", text)}
-                  style={styles.input}
-                  placeholder="Digite o nome do bebê"
-                  placeholderTextColor="#aaa"
-                />
-              </View>
-
-              {/* Checkbox dos termos */}
-              <View style={styles.termsContainer}>
-                <TouchableOpacity style={styles.checkbox} onPress={() => setAcceptedTerms(!acceptedTerms)}>
-                  <View style={[styles.checkboxBox, acceptedTerms && styles.checkboxChecked]}>
-                    {acceptedTerms && <Text style={styles.checkmark}>✓</Text>}
                   </View>
-                </TouchableOpacity>
-                <View style={styles.termsTextContainer}>
-                  <Text style={styles.termsText}>Li e aceito os </Text>
-                  <TouchableOpacity onPress={() => router.push({ pathname: '/(Auth)/termos', params: { returnStep: '2' } })}>
-                    <Text style={styles.termsLink}>Termos de Uso e Política de Privacidade</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </ScrollView>
-          )}
 
-          {/* Botões de ação */}
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              style={[styles.continueButton, loading && styles.buttonDisabled]}
-              onPress={handleSubmit}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
+                  <View style={styles.fieldContainer}>
+                    <Text style={styles.inputLabel}>E-mail</Text>
+                    <TextInput
+                      value={formData.email}
+                      onChangeText={(text) => handleChange("email", text)}
+                      keyboardType="email-address"
+                      style={styles.input}
+                      placeholder="Digite seu e-mail"
+                      placeholderTextColor="#aaa"
+                    />
+                  </View>
+
+                  <View style={styles.fieldContainer}>
+                    <Text style={styles.inputLabel}>Senha</Text>
+                    <View style={styles.passwordContainer}>
+                      <TextInput
+                        value={formData.senha}
+                        onChangeText={(text) => handleChange("senha", text)}
+                        secureTextEntry={!showPassword}
+                        style={styles.passwordInput}
+                        placeholder="Digite sua senha"
+                        placeholderTextColor="#aaa"
+                      />
+                      <TouchableOpacity
+                        style={styles.eyeIcon}
+                        onPress={() => setShowPassword(!showPassword)}
+                      >
+                        <Ionicons
+                          name={showPassword ? "eye-off" : "eye"}
+                          size={24}
+                          color="#707070"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={styles.passwordHint}>
+                      Use pelo menos 8 caracteres, incluindo 1 letra minúscula, 1 maiúscula, 1 número e 1 caractere especial (como @#$%)
+                    </Text>
+                  </View>
+                </ScrollView>
               ) : (
-                <Text style={styles.continueButtonText}>
-                  {step === 1 ? "AVANÇAR" : "FINALIZAR CADASTRO"}
-                </Text>
-              )}
-            </TouchableOpacity>
+                // Etapa 2: Dados do bebê
+                <ScrollView style={styles.formContainer}>
+                  <View style={styles.fieldContainer}>
+                    <Text style={styles.inputLabel}>DPP (Data Provável do Parto)</Text>
+                    <TouchableOpacity style={styles.dateInput} onPress={() => setShowDatePicker(true)}>
+                      <Text style={formData.dpp ? styles.dateText : styles.placeholderText}>
+                        {formData.dpp || "Selecione a data"}
+                      </Text>
+                    </TouchableOpacity>
+                    {showDatePicker && (
+                      <DateTimePicker
+                        value={dppDate}
+                        mode="date"
+                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        locale="pt-BR"
+                        onChange={handleDateChange}
+                      />
+                    )}
+                  </View>
 
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={async () => {
-                if (step === 1) {
-                  await clearTempFormData();
-                  router.back();
-                } else {
-                  setStep(1);
-                }
-              }}
-              disabled={loading}
-            >
-              <Text style={styles.backButtonText}>VOLTAR</Text>
-            </TouchableOpacity>
+                  <View style={styles.fieldContainer}>
+                    <Text style={styles.inputLabel}>Sexo do bebê</Text>
+                    <View style={styles.radioContainer}>
+                      <TouchableOpacity
+                        style={[styles.radioButton, formData.sexoBebe === "Masculino" && styles.radioSelected]}
+                        onPress={() => handleChange("sexoBebe", "Masculino")}
+                      >
+                        <Text style={[styles.radioText, formData.sexoBebe === "Masculino" && { color: "#fff" }]}>
+                          Masculino
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.radioButton, formData.sexoBebe === "Feminino" && styles.radioSelected]}
+                        onPress={() => handleChange("sexoBebe", "Feminino")}
+                      >
+                        <Text style={[styles.radioText, formData.sexoBebe === "Feminino" && { color: "#fff" }]}>
+                          Feminino
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  <View style={styles.fieldContainer}>
+                    <Text style={styles.inputLabel}>Nome do bebê</Text>
+                    <TextInput
+                      value={formData.nomeBebe}
+                      onChangeText={(text) => handleChange("nomeBebe", text)}
+                      style={styles.input}
+                      placeholder="Digite o nome do bebê"
+                      placeholderTextColor="#aaa"
+                    />
+                  </View>
+
+                  {/* Checkbox dos termos */}
+                  <View style={styles.termsContainer}>
+                    <TouchableOpacity style={styles.checkbox} onPress={() => setAcceptedTerms(!acceptedTerms)}>
+                      <View style={[styles.checkboxBox, acceptedTerms && styles.checkboxChecked]}>
+                        {acceptedTerms && <Text style={styles.checkmark}>✓</Text>}
+                      </View>
+                    </TouchableOpacity>
+                    <View style={styles.termsTextContainer}>
+                      <Text style={styles.termsText}>Li e aceito os </Text>
+                      <TouchableOpacity onPress={() => router.push({ pathname: '/(Auth)/termos', params: { returnStep: '2' } })}>
+                        <Text style={styles.termsLink}>Termos de Uso e Política de Privacidade</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </ScrollView>
+              )}
+
+              {/* Botões de ação */}
+              <View style={styles.buttonsContainer}>
+                <TouchableOpacity
+                  style={[styles.continueButton, loading && styles.buttonDisabled]}
+                  onPress={handleSubmit}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.continueButtonText}>
+                      {step === 1 ? "AVANÇAR" : "FINALIZAR CADASTRO"}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.backButton}
+                  onPress={async () => {
+                    if (step === 1) {
+                      await clearTempFormData();
+                      router.back();
+                    } else {
+                      setStep(1);
+                    }
+                  }}
+                  disabled={loading}
+                >
+                  <Text style={styles.backButtonText}>VOLTAR</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ImageBackground>
   );
 }
@@ -385,8 +396,15 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     height: "100%",
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
+    paddingVertical: 20,
   },
   container: {
     width: "90%",

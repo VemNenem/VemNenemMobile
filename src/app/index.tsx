@@ -9,6 +9,9 @@ import {
   ImageBackground,
   Alert,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { router } from "expo-router";
@@ -67,78 +70,89 @@ export default function Login() {
       style={styles.background}
       resizeMode="cover"
     >
-      <View style={styles.container}>
-        <Image source={require("../../assets/images/logo.png")} style={styles.logo} />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardView}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.container}>
+            <Image source={require("../../assets/images/logo.png")} style={styles.logo} />
 
-        <View style={styles.card}>
-          <Text style={styles.title}>Bem vindo(a)!</Text>
+            <View style={styles.card}>
+              <Text style={styles.title}>Bem vindo(a)!</Text>
 
-          <Text style={styles.inputLabel}>E-mail</Text>
-          <TextInput
-            placeholder="E-mail"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            style={styles.input}
-            placeholderTextColor="#707070"
-          />
+              <Text style={styles.inputLabel}>E-mail</Text>
+              <TextInput
+                placeholder="E-mail"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                style={styles.input}
+                placeholderTextColor="#707070"
+              />
 
-          <Text style={styles.inputLabel}>Senha</Text>
-          <View style={styles.passwordContainer}>
-            <TextInput
-              placeholder="Senha"
-              value={senha}
-              onChangeText={setSenha}
-              secureTextEntry={!mostrarSenha}
-              style={styles.passwordInput}
-              placeholderTextColor="#707070"
-            />
-            <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
-              <Ionicons name={mostrarSenha ? "eye-off" : "eye"} size={24} color="gray" />
-            </TouchableOpacity>
-          </View>
+              <Text style={styles.inputLabel}>Senha</Text>
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  placeholder="Senha"
+                  value={senha}
+                  onChangeText={setSenha}
+                  secureTextEntry={!mostrarSenha}
+                  style={styles.passwordInput}
+                  placeholderTextColor="#707070"
+                />
+                <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
+                  <Ionicons name={mostrarSenha ? "eye-off" : "eye"} size={24} color="gray" />
+                </TouchableOpacity>
+              </View>
 
-          <TouchableOpacity style={styles.forgotPasswordButton} onPress={() => router.push("/(Auth)/recuperar")}>
-            <Text style={styles.link}>Esqueci a senha</Text>
-          </TouchableOpacity>
+              <TouchableOpacity style={styles.forgotPasswordButton} onPress={() => router.push("/(Auth)/recuperar")}>
+                <Text style={styles.link}>Esqueci a senha</Text>
+              </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.rememberMeContainer}
-            onPress={() => setLembrarMe(!lembrarMe)}
-            activeOpacity={0.7}
-          >
-            <View style={styles.checkbox}>
-              {lembrarMe && (
-                <Ionicons name="checkmark" size={18} color="#42CFE0" />
-              )}
+              <TouchableOpacity
+                style={styles.rememberMeContainer}
+                onPress={() => setLembrarMe(!lembrarMe)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.checkbox}>
+                  {lembrarMe && (
+                    <Ionicons name="checkmark" size={18} color="#42CFE0" />
+                  )}
+                </View>
+                <Text style={styles.rememberMeText}>Lembrar de mim</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.loginButton, carregando && styles.loginButtonDisabled]}
+                onPress={handleLogin}
+                disabled={carregando}
+              >
+                {carregando ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.loginButtonText}>ENTRAR</Text>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.registerButton} onPress={() => router.push("/(Auth)/cadastro")}>
+                <Text style={styles.registerButtonText}>CADASTRAR</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => router.push('/(Auth)/termos')}>
+                <Text style={styles.termsText}>
+                  Termos de Uso e Política de Privacidade
+                </Text>
+              </TouchableOpacity>
+
             </View>
-            <Text style={styles.rememberMeText}>Lembrar de mim</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.loginButton, carregando && styles.loginButtonDisabled]}
-            onPress={handleLogin}
-            disabled={carregando}
-          >
-            {carregando ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.loginButtonText}>ENTRAR</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.registerButton} onPress={() => router.push("/(Auth)/cadastro")}>
-            <Text style={styles.registerButtonText}>CADASTRAR</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => router.push('/(Auth)/termos')}>
-            <Text style={styles.termsText}>
-              Termos de Uso e Política de Privacidade
-            </Text>
-          </TouchableOpacity>
-
-        </View>
-      </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ImageBackground>
   );
 }
@@ -148,6 +162,12 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     height: "100%",
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
   },

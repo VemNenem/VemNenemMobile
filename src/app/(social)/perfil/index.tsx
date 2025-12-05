@@ -175,14 +175,13 @@ const Perfil = () => {
 
             <View style={styles.fieldContainer}>
               <Text style={styles.label}>DPP (Data Provável do Parto)</Text>
-              <TextInput
-                style={styles.input}
-                value={dpp ? dpp.toLocaleDateString('pt-BR') : ''}
-                placeholder="DD/MM/AAAA"
-                placeholderTextColor="#aaa"
-                onPressIn={() => setShowDatePicker(true)}
-                editable={false}
-              />
+              <TouchableOpacity onPress={() => setShowDatePicker(true)} activeOpacity={0.7}>
+                <View style={styles.input} pointerEvents="none">
+                  <Text style={dpp ? styles.dateText : styles.placeholderText}>
+                    {dpp ? dpp.toLocaleDateString('pt-BR') : 'DD/MM/AAAA'}
+                  </Text>
+                </View>
+              </TouchableOpacity>
               {showDatePicker && (
                 <DateTimePicker
                   value={dpp || new Date()}
@@ -242,112 +241,121 @@ export default Perfil;
 
 const styles = StyleSheet.create({
   safeArea: {
-  flex: 1,
-  backgroundColor: '#42CFE0',
-},
-container: {
-  flex: 1,
-  paddingHorizontal: 16,
-  paddingTop: 10,
-},
-headerWrapper: {
-  backgroundColor: '#42CFE0',
-},
-scrollContent: {
-  flexGrow: 1,
-},
-formBox: {
-  backgroundColor: '#fff',
-  borderRadius: 20,
-  padding: 20,
-  width: '100%',
-},
-fieldContainer: {
-  marginBottom: 20,
-},
-label: {
-  fontSize: 14,
-  color: '#707070',
-  marginBottom: 5,
-},
-input: {
-  fontSize: 16,
-  color: '#000',
-  borderWidth: 1,
-  borderColor: '#ccc',
-  borderRadius: 10,
-  paddingVertical: 10,
-  paddingHorizontal: 15,
-  backgroundColor: '#fff',
-},
-radioContainer: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-},
-radioButton: {
-  flex: 1,
-  paddingVertical: 10,
-  alignItems: 'center',
-  borderWidth: 1,
-  borderColor: '#ccc',
-  borderRadius: 10,
-  marginRight: 10,
-},
-radioSelected: {
-  backgroundColor: '#42CFE0',
-  borderColor: '#42CFE0',
-},
-radioText: {
-  fontSize: 16,
-  color: '#000',
-},
-button: {
-  marginTop: 10,
-  paddingVertical: 10,
-  alignItems: 'center',
-},
-buttonText: {
-  fontWeight: '500',
-  fontSize: 14,
-  color: '#707070',
-  textDecorationLine: 'underline',
-},
-saveButton: {
-  marginTop: 20,
-  backgroundColor: '#42CFE0',
-  padding: 15,
-  borderRadius: 10,
-  alignItems: 'center',
-},
-saveButtonDisabled: {
-  opacity: 0.6,
-},
-saveButtonText: {
-  color: 'white',
-  fontSize: 14,
-  fontWeight: 'bold',
-},
-deleteButton: {
-  marginTop: 15,
-  padding: 15,
-  borderRadius: 10,
-  alignItems: 'center',
-  backgroundColor: '#F67173',
-},
-deleteButtonText: {
-  color: '#fff',
-  fontSize: 14,
-  fontWeight: 'bold',
-},
-loadingContainer: {
-  flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: 20,
-},
-loadingText: {
-  marginTop: 10,
-  color: '#fff',
-  fontSize: 16,
-},
+    flex: 1,
+    backgroundColor: '#42CFE0',
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 10,
+  },
+  headerWrapper: {
+    backgroundColor: '#42CFE0',
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  formBox: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    width: '100%',
+  },
+  fieldContainer: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 14,
+    color: '#707070',
+    marginBottom: 5,
+  },
+  input: {
+    fontSize: 16,
+    color: '#000',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+  },
+  dateText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  placeholderText: {
+    fontSize: 16,
+    color: '#aaa',
+  },
+  radioContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  radioButton: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    marginRight: 10,
+  },
+  radioSelected: {
+    backgroundColor: '#42CFE0',
+    borderColor: '#42CFE0',
+  },
+  radioText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  button: {
+    marginTop: 10,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontWeight: '500',
+    fontSize: 14,
+    color: '#707070',
+    textDecorationLine: 'underline',
+  },
+  saveButton: {
+    marginTop: 20,
+    backgroundColor: '#42CFE0',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  saveButtonDisabled: {
+    opacity: 0.6,
+  },
+  saveButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  deleteButton: {
+    marginTop: 15,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    backgroundColor: '#F67173',
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    color: '#fff',
+    fontSize: 16,
+  },
 });

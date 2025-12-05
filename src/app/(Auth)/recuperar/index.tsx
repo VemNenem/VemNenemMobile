@@ -12,6 +12,9 @@ import {
   ImageBackground,
   Alert,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { forgotPassword } from '@/src/service/esqueciSenhaService';
@@ -31,7 +34,7 @@ export default function RecuperarSenha() {
     //Ativa o indicador de carregamento
     setLoading(true);
     try {
-      const response = await forgotPassword({ email: email.trim() });
+      const response = await forgotPassword({ email: email.trim().toLowerCase() });
 
       //Mostra o alerta de sucesso e redireciona para a tela de redefinição
       if (response.success) {
@@ -63,52 +66,63 @@ export default function RecuperarSenha() {
       style={styles.background}
       resizeMode="cover"
     >
-      <View style={styles.container}>
-        <Image source={require("../../../../assets/images/logo.png")} style={styles.logo} />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardView}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.container}>
+            <Image source={require("../../../../assets/images/logo.png")} style={styles.logo} />
 
-        <View style={styles.card}>
-          <Text style={styles.title}>Recuperar senha</Text>
+            <View style={styles.card}>
+              <Text style={styles.title}>Recuperar senha</Text>
 
-          <Text style={styles.description}>
-            O email precisa ter sido cadastrado na plataforma anteriormente
-          </Text>
-          {/* Input de email */}
-          <Text style={styles.inputLabel}>Email</Text>
-          <TextInput
-            placeholder="Email"
-            keyboardType="email-address"
-            style={styles.input}
-            placeholderTextColor="#707070"
-            value={email}
-            onChangeText={setEmail}
-            editable={!loading}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
+              <Text style={styles.description}>
+                O email precisa ter sido cadastrado na plataforma anteriormente
+              </Text>
+              {/* Input de email */}
+              <Text style={styles.inputLabel}>Email</Text>
+              <TextInput
+                placeholder="Email"
+                keyboardType="email-address"
+                style={styles.input}
+                placeholderTextColor="#707070"
+                value={email}
+                onChangeText={setEmail}
+                editable={!loading}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
 
-          {/* Botão para enviar email */}
-          <TouchableOpacity
-            style={[styles.continueButton, loading && styles.buttonDisabled]}
-            onPress={handleEnviar}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" size="small" />
-            ) : (
-              <Text style={styles.continueButtonText}>ENVIAR</Text>
-            )}
-          </TouchableOpacity>
+              {/* Botão para enviar email */}
+              <TouchableOpacity
+                style={[styles.continueButton, loading && styles.buttonDisabled]}
+                onPress={handleEnviar}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.continueButtonText}>ENVIAR</Text>
+                )}
+              </TouchableOpacity>
 
-          {/* Botão para voltar */}
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-            disabled={loading}
-          >
-            <Text style={styles.backButtonText}>VOLTAR</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+              {/* Botão para voltar */}
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => router.back()}
+                disabled={loading}
+              >
+                <Text style={styles.backButtonText}>VOLTAR</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ImageBackground>
   );
 }
@@ -118,6 +132,12 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     height: "100%",
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
   },

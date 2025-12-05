@@ -60,13 +60,13 @@ const getHoje = (): string => {
 
     if (dateStr.includes('NaN')) {
       console.error('Data inválida gerada:', dateStr);
-      return '2025-01-13'; 
+      return '2025-01-13';
     }
 
     return dateStr;
   } catch (error) {
     console.error('Erro ao gerar data:', error);
-    return '2025-01-13'; 
+    return '2025-01-13';
   }
 };
 
@@ -79,7 +79,7 @@ const getCurrentMonth = (): string => {
 
     if (monthStr.includes('NaN')) {
       console.error('Mês inválido gerado:', monthStr);
-      return '2025-01'; 
+      return '2025-01';
     }
 
     return monthStr;
@@ -286,10 +286,17 @@ export default function TelaAgenda() {
       });
 
       if (response.success) {
-        await fetchDaySchedule(dataSelecionada);
-        await fetchMonthSchedule(currentMonth);
         setModalEditarVisivel(false);
         setEventoSelecionado(null);
+
+        // Executa as requisições em paralelo para ser mais rápido
+        Promise.all([
+          fetchDaySchedule(dataSelecionada),
+          fetchMonthSchedule(currentMonth)
+        ]).catch(error => {
+          console.error('Erro ao atualizar agenda:', error);
+        });
+
         alert('Evento atualizado com sucesso!');
       } else {
         alert(response.message || 'Erro ao atualizar evento');
@@ -307,9 +314,16 @@ export default function TelaAgenda() {
       const response = await deleteSchedule(jwt, eventoSelecionado.documentId);
 
       if (response.success) {
-        await fetchDaySchedule(dataSelecionada);
-        await fetchMonthSchedule(currentMonth);
         fecharModal();
+
+        // Executa as requisições em paralelo para ser mais rápido
+        Promise.all([
+          fetchDaySchedule(dataSelecionada),
+          fetchMonthSchedule(currentMonth)
+        ]).catch(error => {
+          console.error('Erro ao atualizar agenda:', error);
+        });
+
         alert('Evento deletado com sucesso!');
       } else {
         alert(response.message || 'Erro ao deletar evento');
@@ -334,9 +348,16 @@ export default function TelaAgenda() {
       });
 
       if (response.success) {
-        await fetchDaySchedule(dataSelecionada);
-        await fetchMonthSchedule(currentMonth);
         setModalAdicionarVisivel(false);
+
+        // Executa as requisições em paralelo para ser mais rápido
+        Promise.all([
+          fetchDaySchedule(dataSelecionada),
+          fetchMonthSchedule(currentMonth)
+        ]).catch(error => {
+          console.error('Erro ao atualizar agenda:', error);
+        });
+
         alert('Evento criado com sucesso!');
       } else {
         alert(response.message || 'Erro ao criar evento');

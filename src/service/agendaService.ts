@@ -1,4 +1,15 @@
 const API_URL = 'https://api.vemnenem.app.br/api';
+const REQUEST_TIMEOUT = 10000; // 10 segundos
+
+// Função helper para adicionar timeout nas requisições
+const fetchWithTimeout = (url: string, options: RequestInit, timeout = REQUEST_TIMEOUT): Promise<Response> => {
+    return Promise.race([
+        fetch(url, options),
+        new Promise<Response>((_, reject) =>
+            setTimeout(() => reject(new Error('Timeout: A requisição demorou muito')), timeout)
+        )
+    ]);
+};
 
 export interface Schedule {
     id: number;
@@ -6,7 +17,7 @@ export interface Schedule {
     name: string;
     description: string;
     date: string;
-    time: string; 
+    time: string;
     createdAt: string;
     updatedAt: string;
     publishedAt: string;
@@ -29,13 +40,13 @@ export interface CreateScheduleData {
     name: string;
     description: string;
     date: string;
-    time: string; 
+    time: string;
 }
 
 export interface UpdateScheduleData {
     name: string;
     description: string;
-    date: string; 
+    date: string;
     time: string;
 }
 
@@ -67,7 +78,7 @@ const getCurrentMonth = (): string => {
 
 export const getMonthSchedule = async (
     jwt: string,
-    month?: string 
+    month?: string
 ): Promise<MonthScheduleResponse> => {
     try {
         if (!jwt) {
@@ -79,7 +90,7 @@ export const getMonthSchedule = async (
 
         const monthParam = month || getCurrentMonth();
 
-        const response = await fetch(`${API_URL}/getMonthSchedule?month=${monthParam}`, {
+        const response = await fetchWithTimeout(`${API_URL}/getMonthSchedule?month=${monthParam}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -111,7 +122,7 @@ export const getMonthSchedule = async (
 
 export const getDaySchedule = async (
     jwt: string,
-    day?: string 
+    day?: string
 ): Promise<DayScheduleResponse> => {
     try {
         if (!jwt) {
@@ -123,7 +134,7 @@ export const getDaySchedule = async (
 
         const dayParam = day || getCurrentDate();
 
-        const response = await fetch(`${API_URL}/getDaySchedule?day=${dayParam}`, {
+        const response = await fetchWithTimeout(`${API_URL}/getDaySchedule?day=${dayParam}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -165,7 +176,7 @@ export const createSchedule = async (
             };
         }
 
-        const response = await fetch(`${API_URL}/createSchedule`, {
+        const response = await fetchWithTimeout(`${API_URL}/createSchedule`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -210,7 +221,7 @@ export const updateSchedule = async (
             };
         }
 
-        const response = await fetch(`${API_URL}/updateSchedule?scheduleDocumentId=${scheduleDocumentId}`, {
+        const response = await fetchWithTimeout(`${API_URL}/updateSchedule?scheduleDocumentId=${scheduleDocumentId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -254,7 +265,7 @@ export const deleteSchedule = async (
             };
         }
 
-        const response = await fetch(`${API_URL}/deleteSchedule?scheduleDocumentId=${scheduleDocumentId}`, {
+        const response = await fetchWithTimeout(`${API_URL}/deleteSchedule?scheduleDocumentId=${scheduleDocumentId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
