@@ -23,6 +23,8 @@ export default function Cadastro() {
   const [loading, setLoading] = useState(false); // Indica se está processando
   const [acceptedTerms, setAcceptedTerms] = useState(false); // Se aceitou os termos
   const [showPassword, setShowPassword] = useState(false); // Controla visibilidade da senha
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Controla visibilidade da confirmação
+  const [confirmarSenha, setConfirmarSenha] = useState(""); // Campo de confirmar senha
 
   // Dados do formulário
   const [formData, setFormData] = useState({
@@ -138,6 +140,16 @@ export default function Cadastro() {
       // Validação da etapa 1
       if (!formData.nome || !formData.email || !formData.senha) {
         Alert.alert("Erro", "Preencha todos os campos obrigatórios");
+        return;
+      }
+
+      if (!confirmarSenha) {
+        Alert.alert("Erro", "Por favor, confirme sua senha");
+        return;
+      }
+
+      if (formData.senha !== confirmarSenha) {
+        Alert.alert("Erro", "As senhas não coincidem");
         return;
       }
 
@@ -278,6 +290,30 @@ export default function Cadastro() {
                     <Text style={styles.passwordHint}>
                       Use pelo menos 8 caracteres, incluindo 1 letra minúscula, 1 maiúscula, 1 número e 1 caractere especial (como @#$%)
                     </Text>
+                  </View>
+
+                  <View style={styles.fieldContainer}>
+                    <Text style={styles.inputLabel}>Confirmar Senha</Text>
+                    <View style={styles.passwordContainer}>
+                      <TextInput
+                        value={confirmarSenha}
+                        onChangeText={setConfirmarSenha}
+                        secureTextEntry={!showConfirmPassword}
+                        style={styles.passwordInput}
+                        placeholder="Digite sua senha novamente"
+                        placeholderTextColor="#aaa"
+                      />
+                      <TouchableOpacity
+                        style={styles.eyeIcon}
+                        onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        <Ionicons
+                          name={showConfirmPassword ? "eye-off" : "eye"}
+                          size={24}
+                          color="#707070"
+                        />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </ScrollView>
               ) : (
